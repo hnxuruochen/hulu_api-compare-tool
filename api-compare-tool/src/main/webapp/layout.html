@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- third party css -->
+    <link rel="stylesheet" type="text/css" href="css/vendor/semantic.min.css" />
+    <!-- local css -->
+    <link rel="stylesheet" type="text/css" href="css/layout.css" />
+    <!-- third party js -->
+    <script type="text/javascript" src="js/vendor/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="js/vendor/angular.min.js"></script>
+    <script type="text/javascript" src="js/vendor/angular-route.min.js"></script>
+    <script type="text/javascript" src="js/vendor/semantic.min.js"></script>
+    <!-- local js -->
+    <script type="text/javascript" src="js/layout.js"></script>
+    <script type="text/javascript" src="js/router.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="js/tasks.js"></script>
+    <script type="text/javascript" src="js/tags.js"></script>
+    <script type="text/javascript" src="js/errors.js"></script>
+</head>
+
+<body>
+    <div class="ui black inverted menu" id="headerApp" ng-app="headerApp" ng-controller="headerController">
+        <img src="images/logo.png" alt="some_text">
+        <a class="item" href="#index">
+            Home
+        </a>
+        <a class="item" href="#tasks">
+            Tasks
+        </a>
+        <a class="item" href="#tags">
+            Tags
+        </a>
+        <div class="right ui item">
+            Welcome, {{userData.userName}}!
+        </div>
+    </div>
+    <div ng-app="mainApp" id="mainApp" ng-view>
+    </div>
+</body>
+
+</html>

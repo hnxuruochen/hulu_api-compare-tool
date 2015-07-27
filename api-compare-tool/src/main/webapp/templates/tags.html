@@ -1,0 +1,58 @@
+<!-- Edit tag module -->
+<div class="ui modal basic">
+    <div class="ui center aligned container">
+        <div style="margin-bottom: 10px;" ng-show="removingTag">
+            Do you want to remove this tag?
+        </div>
+        <div class="ui input focus">
+            <input type="text" ng-model="tagName" ng-disabled="editBlock || removingTag">
+        </div>
+        <div style="margin-top: 10px;">
+            {{editStatus}}
+        </div>
+        <div style="margin-top: 10px;">
+            <button class="ui primary button" ng-click="saveTag()" ng-disabled="editBlock">
+                Ok
+            </button>
+            <button class="ui button" ng-click="cancelTag()" ng-disabled="editBlock">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+<!-- Tags table -->
+<table class="ui celled table" ng-show="!preparingData">
+    <thead>
+        <tr>
+            <th style="width: 33%">
+                <div class="ui input transparent fluid icon">
+                    <input type="text" placeholder="Name" ng-model="filter.name">
+                    <i class="plus icon link" ng-click="addTag()"></i>
+                </div>
+            </th>
+            <th>
+                <div class="ui input transparent fluid">
+                    <input type="text" placeholder="Creator" ng-model="filter.creator">
+                </div>
+            </th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="t in tags | filter: filter | orderBy: 'name'">
+            <td>
+                <div class="ui icon input transparent fluid">
+                    <input type="text" ng-model="t.name" disabled>
+                    <span ng-show="t.creator == userData.userAccount">
+                    	<i class="edit icon link" ng-click="editTag(t)"></i>
+                    	<i class="remove red circle icon link" ng-click="removeTag(t)"></i>
+                    </span>
+                </div>
+            </td>
+            <td>{{t.creator}}</td>
+            <td>{{t.time}}</td>
+        </tr>
+    </tbody>
+</table>
+<!-- Loader -->
+<div class="ui active centered large inline loader" style="margin-top: 100px;" ng-show="preparingData"></div>
