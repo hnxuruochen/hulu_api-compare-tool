@@ -64,7 +64,7 @@ public class ApiController {
 		// Check permission.
 		if (oldTag != null) {
 			String creator = TAG.getTagCreator(oldTag);
-			if (!creator.equals(user)) {
+			if ((user == null) || (!creator.equals(user))) {
 				return new TagResponse(new Status(false,
 						"Not creator, operation not allowed."), null);
 			}

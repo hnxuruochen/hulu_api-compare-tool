@@ -17,6 +17,9 @@ mainApp.config(["$routeProvider", function($routeProvider) {
             templateUrl: "templates/errors.html",
             controller: "ErrorsController"
         })
+        .when("/404", {
+            templateUrl: "templates/404.html",
+        })
         .otherwise({
             redirectTo: "/index"
         });
