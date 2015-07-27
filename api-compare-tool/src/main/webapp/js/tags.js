@@ -63,21 +63,27 @@ mainApp.controller("TagsController", function($scope, $http) {
             })
             .success(function(data) {
                 $scope.editStatus = data.status.message;
-                $scope.editBlock = false;
-                setTimeout(function() {
-                    jq(".modal input").focus();
-                }, 1);
                 if (data.status.success) {
                     var p = $scope.tags.indexOf($scope.currentTag);
                     if ($scope.removingTag) {
                         $scope.tags.splice(p, 1);
                     } else {
                         $scope.tags[p] = data.tag;
-                        $scope.editStatus = "";
                     }
                     jq(".ui.modal")
                         .modal("hide");
+                    $scope.editStatus = "";
                 }
+            })
+            .error(function() {
+                $scope.editStatus = "Connection failed."
+            })
+            .finally(function() {
+                $scope.editBlock = false;
+                setTimeout(function() {
+                    jq(".modal input").focus();
+                }, 1);
+
             });
     };
     $scope.cancelTag = function() {
@@ -86,6 +92,7 @@ mainApp.controller("TagsController", function($scope, $http) {
         }
         jq(".ui.modal")
             .modal("hide");
+        $scope.editStatus = "";
     };
 });
 $(document).ready(function($) {});
