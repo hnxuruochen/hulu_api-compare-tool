@@ -12,16 +12,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class WebController implements ErrorController {
-	@RequestMapping("/")
-	public String index() {
+	/**
+	 * Return layout template for all unknown urls and frontend will route.
+	 * 
+	 * @return layout template.
+	 */
+	@RequestMapping("/error")
+	public String error() {
+		// If frontend's html5mode is disabled, just add the # tag and redirect.
+		// return "redirect:/#" + request.getRequestURI();
 		return "layout.html";
 	}
 
-	@RequestMapping("/error")
-	public String error() {
-		return "redirect:/#/404";
-	}
-
+	/**
+	 * Useless, but must override it for changing error page.
+	 */
 	@Override
 	public String getErrorPath() {
 		return "/error";

@@ -1,19 +1,15 @@
 "use strict";
 var jq = angular.element;
-var userData = {};
 
 var mainApp = angular.module("mainApp", ["ngRoute"]);
-var headerApp = angular.module("headerApp", []);
-headerApp.controller("headerController", function($scope, $http) {
-	$scope.userData = userData;
+mainApp.controller("headerController", function($scope, $rootScope, $http) {
+	// Load user info.
     $http.get("/api/user/info")
         .success(function(data) {
-            userData.userName = data.first_name + " " + data.last_name;
-            userData.userAccount = data.username;
+        	$rootScope.userData = {};
+            $rootScope.userData.userName = data.first_name + " " + data.last_name;
+            $rootScope.userData.userAccount = data.username;
         });
 });
 $(document).ready(function($) {
-    angular.bootstrap(document.getElementById("mainApp"), ["mainApp"]);
-    $(".ui.dropdown")
-        .dropdown();
 });

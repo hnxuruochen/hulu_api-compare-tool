@@ -1,6 +1,5 @@
 "use strict";
-mainApp.controller("TagsController", function($scope, $http) {
-    $scope.userData = userData;
+mainApp.controller("TagsController", function($scope, $rootScope, $http) {
     // Initialize.
     $scope.preparingData = true;
     $scope.tagName = "";
@@ -8,7 +7,7 @@ mainApp.controller("TagsController", function($scope, $http) {
     $scope.currentTag = null;
     $scope.editBlock = false;
     $scope.removingTag = false;
-
+    // Load data.
     $http.get("/api/tags")
         .success(function(data) {
             $scope.preparingData = false;
@@ -30,7 +29,7 @@ mainApp.controller("TagsController", function($scope, $http) {
     $scope.addTag = function() {
         $scope.removingTag = false;
         var tag = {}
-        tag.name = null;
+        tag.id = null;
         $scope.tags.push(tag);
         $scope.tagName = "";
         $scope.currentTag = tag;
@@ -51,14 +50,14 @@ mainApp.controller("TagsController", function($scope, $http) {
     $scope.saveTag = function() {
         $scope.editStatus = "Waiting please.";
         $scope.editBlock = true;
-        var newTag = $scope.tagName;
+        var name = $scope.tagName;
         if ($scope.removingTag) {
-            newTag = null;
+            name = null;
         }
         $http.get("/api/tags/modify", {
                 params: {
-                    "oldTag": $scope.currentTag.name,
-                    "newTag": newTag
+                    id: $scope.currentTag.id,
+                    name: name
                 }
             })
             .success(function(data) {
@@ -95,4 +94,3 @@ mainApp.controller("TagsController", function($scope, $http) {
         $scope.editStatus = "";
     };
 });
-$(document).ready(function($) {});

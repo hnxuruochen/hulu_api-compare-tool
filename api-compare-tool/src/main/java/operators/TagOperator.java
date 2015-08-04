@@ -20,32 +20,37 @@ public enum TagOperator {
 		return template.query(q, new Tag.TagMapper());
 	}
 
-	public Tag addTag(String newTag, String user) {
+	public Tag addTag(String name, String user) {
 		String q = "INSERT INTO tags(name, creator, time) VALUES (?, ?, CURRENT_TIMESTAMP());";
-		template.update(q, newTag, user);
+		template.update(q, name, user);
 		q = "SELECT * FROM tags WHERE name = ?";
-		return template.queryForObject(q, new Tag.TagMapper(), newTag);
+		return template.queryForObject(q, new Tag.TagMapper(), name);
 	}
 
-	public String getTagCreator(String tag) {
-		String q = "SELECT creator FROM tags WHERE name = ?";
+	public String getTagCreator(Integer id) {
+		String q = "SELECT creator FROM tags WHERE id = ?";
 		String output = null;
 		try {
-			output = template.queryForObject(q, String.class, tag);
+			output = template.queryForObject(q, String.class, id);
 		} catch (DataAccessException e) {
 		}
 		return output;
 	}
 
-	public Tag updateTag(String oldTag, String newTag) {
-		String q = "UPDATE tags SET name = ?, time = CURRENT_TIMESTAMP() WHERE name = ?";
-		template.update(q, newTag, oldTag);
-		q = "SELECT * FROM tags WHERE name = ?";
-		return template.queryForObject(q, new Tag.TagMapper(), newTag);
+	public boolean existName(String name) {
+		String q = "SELECT count(*) FROM tags WHERE name = ?";
+		return template.queryForObject(q, Integer.class, name) > 0;
 	}
 
-	public void deleteTag(String tag) {
-		String q = "DELETE FROM tags WHERE name = ?";
-		template.update(q, tag);
+	public Tag updateTag(Integer id, String name) {
+		String q = "UPDATE tags SET name = ?, time = CURRENT_TIMESTAMP() WHERE id = ?";
+		template.update(q, name, id);
+		q = "SELECT * FROM tags WHERE id = ?";
+		return template.queryForObject(q, new Tag.TagMapper(), id);
+	}
+
+	public void deleteTag(Integer id) {
+		String q = "DELETE FROM tags WHERE id = ?";
+		template.update(q, id);
 	}
 }

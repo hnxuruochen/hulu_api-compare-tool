@@ -21,6 +21,7 @@ import com.hulu.sso.Sso;
 
 @Configuration
 public class AuthenticationFilter implements Filter {
+	public static final String LOGIN_SERVER = "https://login.hulu.com";
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -48,10 +49,9 @@ public class AuthenticationFilter implements Filter {
 		JsonObject data = null;
 		// Verify data.
 		try {
-			data = Sso.verifyCookie(ssoData, ssoSig, null,
-					WebAppInitializer.LOGIN_SERVER, null);
+			data = Sso.verifyCookie(ssoData, ssoSig, null, LOGIN_SERVER, null);
 		} catch (HuluAuthException e) {
-			httpResponse.sendRedirect(WebAppInitializer.LOGIN_SERVER
+			httpResponse.sendRedirect(LOGIN_SERVER
 					+ "/?redirect="
 					+ URLEncoder.encode(
 							"http://" + httpRequest.getServerName() + ":"

@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <base href="/">
     <!-- third party css -->
     <link rel="stylesheet" type="text/css" href="css/vendor/semantic.min.css" />
     <!-- local css -->
@@ -15,27 +16,30 @@
     <script type="text/javascript" src="js/router.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
     <script type="text/javascript" src="js/tasks.js"></script>
+    <script type="text/javascript" src="js/tasks_id.js"></script>
     <script type="text/javascript" src="js/tags.js"></script>
     <script type="text/javascript" src="js/errors.js"></script>
 </head>
 
-<body>
-    <div class="ui black inverted menu" id="headerApp" ng-app="headerApp" ng-controller="headerController">
+<body ng-app="mainApp">
+    <!-- Indexer -->
+    <div class="ui black inverted menu" ng-controller="headerController">
         <img src="images/logo.png" alt="some_text">
-        <a class="item" href="#index">
+        <a class="item" href="/index">
             Home
         </a>
-        <a class="item" href="#tasks">
+        <a class="item" href="/tasks">
             Tasks
         </a>
-        <a class="item" href="#tags">
+        <a class="item" href="/tags">
             Tags
         </a>
         <div class="right ui item">
             Welcome, {{userData.userName}}!
         </div>
     </div>
-    <div ng-app="mainApp" id="mainApp" ng-view>
+    <!-- Pages -->
+    <div ng-view>
     </div>
 </body>
 

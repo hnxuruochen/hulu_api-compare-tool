@@ -4,6 +4,14 @@ public class Status {
 	private Boolean success = null;
 	private String message = null;
 
+	public Status(Boolean success) {
+		setSuccess(success);
+		if (success) {
+			setMessage("Success.");
+		} else {
+			setMessage("Error.");
+		}
+	}
 	public Status(Boolean success, String message) {
 		setSuccess(success);
 		setMessage(message);

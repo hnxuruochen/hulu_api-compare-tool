@@ -1,5 +1,5 @@
 "use strict";
-mainApp.config(["$routeProvider", function($routeProvider) {
+mainApp.config(function($routeProvider, $locationProvider) {
     $routeProvider
         .when("/index", {
             templateUrl: "templates/index.html",
@@ -13,15 +13,19 @@ mainApp.config(["$routeProvider", function($routeProvider) {
             templateUrl: "templates/tasks.html",
             controller: "TasksController"
         })
+        .when("/tasks/:id", {
+            templateUrl: "templates/tasks_id.html",
+            controller: "TasksIdController"
+        })
         .when("/errors", {
             templateUrl: "templates/errors.html",
             controller: "ErrorsController"
         })
-        .when("/404", {
-            templateUrl: "templates/404.html",
+        .when("/", {
+            redirectTo: "/index"
         })
         .otherwise({
-            redirectTo: "/index"
+            templateUrl: "templates/404.html"
         });
-}]);
-$(document).ready(function($) {});
+    $locationProvider.html5Mode(true);
+});

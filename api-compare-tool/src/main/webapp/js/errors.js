@@ -2,4 +2,4 @@
 mainApp.controller("ErrorsController", function($scope, $routeParams) {
     //$scope.userId = $routeParams.userId;
 });
-$(document).ready(function($) {});
+

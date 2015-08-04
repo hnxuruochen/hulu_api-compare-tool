@@ -1,1 +1,188 @@
-<p>tasks page</p>
+<!-- Create task modal -->
+<div class="ui modal fullscreen" style="padding: 30px; height: 90%; overflow: scroll;">
+    <div class="ui form" ng-class="{loading: createData.editBlock}">
+        <!-- Common config -->
+        <div class="four fields">
+            <div class="field">
+                <div>
+                    <div class="ui large label">
+                        Tag:
+                    </div>
+                    <select class="ui search dropdown" ng-model="createData.tag">
+                        <option value="">default</option>
+                        <option ng-repeat="t in tags" value="{{t.id}}">{{t.name}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <div>
+                    <div class="ui large label">
+                        Errors limit:
+                    </div>
+                    <select class="ui search dropdown" ng-model="createData.errorsLimit">
+                        <option value="">1</option>
+                        <option value="1">1</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <div>
+                    <div class="ui large label" style="margin-left: 50px;">
+                        Type:
+                    </div>
+                    <label style="margin-left:10px; margin-right: 10px;">Text</label>
+                    <div class="ui toggle checkbox">
+                        <input type="checkbox" name="public" ng-model="createData.type">
+                        <label>Service</label>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <div>
+                    <button class="ui primary button" style="margin-left:5px" ng-click="createTask()">
+                        Create
+                    </button>
+                    <button class="ui button green" ng-click="cancelTask()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="ui divider"></div>
+        <!-- Different type config -->
+        <div class="field" ng-show="createData.type">
+            <div class="two fields">
+                <div class="field">
+                    <div class="ui labeled input">
+                        <div class="ui label">
+                            Address 1:
+                        </div>
+                        <input type="text" placeholder="Address 1" ng-model="createData.address1">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui labeled input">
+                        <div class="ui label">
+                            Address 2:
+                        </div>
+                        <input type="text" placeholder="Address 2" ng-model="createData.address2">
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui large label" style="margin-top:10px;">
+                    Requests:
+                </div>
+                <div style="margin-top:10px;">
+                    <textarea ng-model="createData.requests"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="field" ng-show="!createData.type">
+            <div class="two fields">
+                <div class="field">
+                    <div class="ui large label" style="margin-top:10px;">
+                        Text 1:
+                    </div>
+                    <div style="margin-top:10px;">
+                        <textarea ng-model="createData.text1"></textarea>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui large label" style="margin-top:10px;">
+                        Text 2:
+                    </div>
+                    <div style="margin-top:10px;">
+                        <textarea ng-model="createData.text2"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Status info -->
+        <div class="field">
+            <div class="ui center aligned container">
+                <a class="ui red label" ng-show="createData.editStatus != ''">
+                    {{createData.editStatus}}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Search filter -->
+<div class="ui center aligned container">
+    <div class="ui labeled input">
+        <div class="ui label">
+            Creator:
+        </div>
+        <input style="width: 120px;" type="text" placeholder="All" ng-model="searchData.creator">
+    </div>
+    <div class="ui labeled input" style="width: 450px;">
+        <div class="ui label">
+            Tags:
+        </div>
+        <select class="ui search dropdown fluid" multiple="" ng-model="searchData.tags">
+            <option value="">All</option>
+            <option ng-repeat="t in tags" value="{{t.id}}">{{t.name}}</option>
+        </select>
+    </div>
+    <div class="ui labeled input" style="width: 250px;">
+        <div class="ui label">
+            Status:
+        </div>
+        <select class="ui search dropdown fluid" multiple="" ng-model="searchData.status">
+            <option value="">All</option>
+            <option value="0">wating</option>
+            <option value="1">running</option>
+            <option value="2">finished</option>
+        </select>
+    </div>
+    <button class="ui primary button" style="margin-left:5px" ng-click="search()" ng-disabled="searchData.preparingTags || searchData.preparingData">
+        Search
+    </button>
+    <button class="ui button green" ng-click="newTask()" ng-disabled="searchData.preparingTags">
+        New
+    </button>
+</div>
+<div class="ui divider"></div>
+<!-- Result table -->
+<table class="ui celled table" style="width: 90%; margin: auto;">
+    <thead>
+        <tr>
+            <th style="width: 5%;">ID</th>
+            <th style="width: 20%;">Creator</th>
+            <th style="width: 25%;">Tag</th>
+            <th style="width: 10%;">Type</th>
+            <th style="width: 10%;">Errors</th>
+            <th style="width: 20%;">Time</th>
+            <th style="width: 10%;">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="t in searchResult" ng-class="{positive: t.status == 2 && t.errorsCount == 0, negative: t.status == 2 && t.errorsCount > 0, warning: t.status == 1}" ng-show="!searchData.preparingData">
+            <td>{{t.id}}</td>
+            <td>{{t.creator}}</td>
+            <td>{{tagsIdMap[t.tag].name}}</td>
+            <td>{{types[t.type]}}</td>
+            <td>{{t.errorsCount}}</td>
+            <td>{{t.time}}</td>
+            <td style="cursor: pointer;">
+                <a style="color: inherit;" ng-href="/tasks/{{t.id}}">
+                    {{status[t.status]}}
+                    <i class="chevron right icon" style="margin-left: 10px;"></i>
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<!-- Loader -->
+<div class="ui active centered large inline loader" style="margin-top: 100px;" ng-show="searchData.preparingData"></div>
+<!-- Scripts after loading -->
+<script>
+$(document).ready(function($) {
+    $(".ui.dropdown")
+        .dropdown();
+});
+</script>
