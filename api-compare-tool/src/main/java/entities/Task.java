@@ -7,6 +7,12 @@ import org.springframework.jdbc.core.RowMapper;
 
 public class Task {
 	public static class TaskMapper implements RowMapper<Task> {
+		private boolean fullData = false;
+
+		public TaskMapper(boolean full) {
+			fullData = full;
+		}
+
 		@Override
 		public Task mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Task task = new Task();
@@ -14,9 +20,11 @@ public class Task {
 			task.setCreator(rs.getString("creator"));
 			task.setTag(rs.getInt("tag"));
 			task.setTime(rs.getDate("time") + "  " + rs.getTime("time"));
-			task.setParam1(rs.getString("param1"));
-			task.setParam2(rs.getString("param2"));
-			task.setRequests(rs.getString("requests"));
+			if (fullData) {
+				task.setParam1(rs.getString("param1"));
+				task.setParam2(rs.getString("param2"));
+				task.setRequests(rs.getString("requests"));
+			}
 			task.setType(rs.getInt("type"));
 			task.setErrorsLimit(rs.getInt("errors_limit"));
 			task.setErrorsCount(rs.getInt("errors_count"));

@@ -17,6 +17,9 @@ import entities.Task;
 
 public enum TaskOperator {
 	INSTANCE;
+	private static final String BASIC_TASK = "id, creator, tag, time, type, errors_limit, errors_count, status";
+	private static final String FULL_TASK = BASIC_TASK
+			+ ", param1, param2, requests";
 	private JdbcTemplate template = null;
 
 	TaskOperator() {
@@ -36,17 +39,21 @@ public enum TaskOperator {
 		if (status != null) {
 			where.add("status in " + status);
 		}
-		String q = "SELECT * FROM tasks";
+		String q = "SELECT " + BASIC_TASK + " FROM tasks";
 		if (where.size() > 0) {
 			q = q + " WHERE " + StringUtils.join(where, " AND ");
 		}
 		q = q + " ORDER BY id DESC;";
-		return template.query(q, new Task.TaskMapper(), param);
+		return template.query(q, new Task.TaskMapper(false), param);
 	}
 
-	public Task getTask(int id) {
-		String q = "SELECT * FROM tasks WHERE id = ?;";
-		return template.queryForObject(q, new Task.TaskMapper(), id);
+	public Task getTask(int id, boolean fullData) {
+		String tmp = BASIC_TASK;
+		if (fullData) {
+			tmp = FULL_TASK;
+		}
+		String q = "SELECT" + tmp + " FROM tasks WHERE id = ?;";
+		return template.queryForObject(q, new Task.TaskMapper(fullData), id);
 	}
 
 	public Task newTask(String creator, Integer tag, Integer errorsLimit,
@@ -70,6 +77,6 @@ public enum TaskOperator {
 				return ps;
 			}
 		}, id);
-		return getTask(id.getKey().intValue());
+		return getTask(id.getKey().intValue(), false);
 	}
 }
