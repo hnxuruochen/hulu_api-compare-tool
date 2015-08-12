@@ -2,6 +2,7 @@ package entities;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.springframework.jdbc.core.RowMapper;
 
@@ -18,7 +19,7 @@ public class Task {
 			Task task = new Task();
 			task.setId(rs.getInt("id"));
 			task.setCreator(rs.getString("creator"));
-			task.setTag(rs.getInt("tag"));
+			task.setTagId(rs.getInt("tag_id"));
 			task.setTime(rs.getDate("time") + "  " + rs.getTime("time"));
 			if (fullData) {
 				task.setParam1(rs.getString("param1"));
@@ -35,7 +36,8 @@ public class Task {
 
 	private Integer id = null;
 	private String creator = null;
-	private Integer tag = null;
+	private Integer tagId = null;
+	private String tagName = null;
 	private String time = null;
 	private String param1 = null;
 	private String param2 = null;
@@ -44,6 +46,7 @@ public class Task {
 	private Integer errorsLimit = null;
 	private Integer errorsCount = null;
 	private Integer status = null;
+	private List<Error> errors = null;
 
 	public void setId(Integer id) {
 		this.id = id;
@@ -53,8 +56,12 @@ public class Task {
 		this.creator = creator;
 	}
 
-	public void setTag(Integer tag) {
-		this.tag = tag;
+	public void setTagId(Integer tagId) {
+		this.tagId = tagId;
+	}
+
+	public void setTagName(String tagName) {
+		this.tagName = tagName;
 	}
 
 	public void setTime(String time) {
@@ -88,6 +95,10 @@ public class Task {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
+	
+	public void setErrors(List<Error> errors) {
+		this.errors = errors;
+	}
 
 	public Integer getId() {
 		return id;
@@ -97,8 +108,12 @@ public class Task {
 		return creator;
 	}
 
-	public Integer getTag() {
-		return tag;
+	public Integer getTagId() {
+		return tagId;
+	}
+
+	public String getTagName() {
+		return tagName;
 	}
 
 	public String getTime() {
@@ -131,5 +146,9 @@ public class Task {
 
 	public Integer getStatus() {
 		return status;
+	}
+	
+	public List<Error> getErrors() {
+		return errors;
 	}
 }

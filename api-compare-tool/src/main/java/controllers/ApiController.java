@@ -5,18 +5,23 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import operators.ErrorOperator;
 import operators.TagOperator;
 import operators.TaskOperator;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import comparator.DefaultJsonComparator;
 
+import responses.ErrorsResponse;
 import responses.TagResponse;
 import responses.TasksResponse;
 import utils.Utils;
+import entities.Error;
 import entities.Status;
 import entities.Tag;
 import entities.Task;
@@ -31,6 +36,7 @@ import entities.Task;
 public class ApiController {
 	private static final TagOperator TAG = TagOperator.INSTANCE;
 	private static final TaskOperator TASK = TaskOperator.INSTANCE;
+	private static final ErrorOperator ERROR = ErrorOperator.INSTANCE;
 
 	/**
 	 * Get user's login info.
@@ -106,7 +112,7 @@ public class ApiController {
 	 */
 	@RequestMapping("/api/tasks/new")
 	public TasksResponse newTask(HttpServletRequest request,
-			@RequestParam(value = "tag") Integer tag,
+			@RequestParam(value = "tag_id") Integer tagId,
 			@RequestParam(value = "errors_limit") Integer errorsLimit,
 			@RequestParam(value = "type") Boolean type,
 			@RequestParam(value = "param1") String param1,
@@ -115,9 +121,19 @@ public class ApiController {
 			throws JsonProcessingException, IOException {
 		String user = Utils.getUserName(request);
 		int t = type ? 1 : 0;
-		Task task = TASK.newTask(user, tag, errorsLimit, t, param1, param2,
+		int id = TASK.newTask(user, tagId, errorsLimit, t, param1, param2,
 				requests);
-		return new TasksResponse(new Status(true), task);
+		if (t == 0) {
+			String output = DefaultJsonComparator.compare(param1, param2);
+			String message = "Different json text.";
+			if (output == null) {
+				message = "Invalid json input.";
+			}
+			ERROR.newError(id, message, "Text compare.", output);
+			TASK.updateTask(id, 1, 2);
+		}
+		return new TasksResponse(new Status(true), TASK.searchTasks(null, null,
+				null, id).get(0));
 	}
 
 	/**
@@ -135,7 +151,21 @@ public class ApiController {
 		}
 		tags = Utils.jsonArrayToIntSet(tags);
 		status = Utils.jsonArrayToIntSet(status);
-		List<Task> tasks = TASK.searchTasks(creator, tags, status);
+		List<Task> tasks = TASK.searchTasks(creator, tags, status, null);
 		return new TasksResponse(new Status(true), tasks);
+	}
+
+	@RequestMapping("/api/tasks/{id}")
+	public TasksResponse getTask(@PathVariable(value = "id") Integer id) {
+		Task task = TASK.getTask(id);
+		Status status = new Status(task != null);
+		return new TasksResponse(status, task);
+	}
+
+	@RequestMapping("/api/errors/{id}")
+	public ErrorsResponse getError(@PathVariable(value = "id") Integer id) {
+		Error error = ERROR.getError(id);
+		Status status = new Status(error != null);
+		return new ErrorsResponse(status, error);
 	}
 }

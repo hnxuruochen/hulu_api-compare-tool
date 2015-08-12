@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.RowMapper;
 public class Tag {
 
 	public static class TagMapper implements RowMapper<Tag> {
-
 		@Override
 		public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Tag tag = new Tag();

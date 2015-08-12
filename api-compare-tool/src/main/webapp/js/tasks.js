@@ -1,5 +1,5 @@
 "use strict";
-mainApp.controller("TasksController", function($scope, $http) {
+mainApp.controller("TasksController", function($scope, $rootScope, $http) {
     // Initialize.
     $scope.initializeSearchData = function() {
         $scope.searchData = {}
@@ -8,13 +8,13 @@ mainApp.controller("TasksController", function($scope, $http) {
         $scope.searchData.creator = "";
         $scope.searchData.tags = [];
         $scope.searchData.status = [];
-        $scope.searchResult = [];
+        //$rootScope.searchResult = [];
     };
     $scope.initializeCreateData = function() {
         $scope.createData = {}
         $scope.createData.editBlock = false;
         $scope.createData.editStatus = "";
-        $scope.createData.tag = "1";
+        $scope.createData.tagId = "1";
         $scope.createData.errorsLimit = "1";
         $scope.createData.type = false;
         $scope.createData.text1 = "";
@@ -25,8 +25,6 @@ mainApp.controller("TasksController", function($scope, $http) {
     };
     $scope.initializeSearchData();
     $scope.initializeCreateData();
-    $scope.types = ["Text", "Service"];
-    $scope.status = ["Waiting", "Running", "Finished"];
     // Load tags data.
     $http.get("/api/tags")
         .success(function(data) {
@@ -35,7 +33,6 @@ mainApp.controller("TasksController", function($scope, $http) {
             for (var i = 0; i < $scope.tags.length; i++) {
                 $scope.tagsIdMap[$scope.tags[i].id] = $scope.tags[i];
             }
-            console.log($scope.tagsIdMap);
             $scope.searchData.preparingTags = false;
         });
 
@@ -49,8 +46,7 @@ mainApp.controller("TasksController", function($scope, $http) {
                 }
             })
             .success(function(data) {
-                console.log(data);
-                $scope.searchResult = data.tasks;
+                $rootScope.searchResult = data.tasks;
             })
             .finally(function() {
                 $scope.searchData.preparingData = false;
@@ -70,11 +66,10 @@ mainApp.controller("TasksController", function($scope, $http) {
             p1 = $scope.createData.address1;
             p2 = $scope.createData.address2;
         }
-        console.log($scope.createData);
         $scope.createData.editBlock = true;
         $http.get("/api/tasks/new", {
                 params: {
-                    tag: $scope.createData.tag,
+                    tag_id: $scope.createData.tagId,
                     errors_limit: $scope.createData.errorsLimit,
                     type: $scope.createData.type,
                     param1: p1,
@@ -98,5 +93,4 @@ mainApp.controller("TasksController", function($scope, $http) {
             .modal("hide");
         $scope.initializeCreateData();
     };
-    //$scope.restaurantId = $routeParams.restaurantId;
 });

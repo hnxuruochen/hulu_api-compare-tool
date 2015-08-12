@@ -1,5 +1,7 @@
 package utils;
 
+import java.util.Random;
+
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.gson.JsonObject;
@@ -23,5 +25,9 @@ public class Utils {
 			return "(" + a.substring(1, a.length() - 1).replaceAll("\"", "")
 					+ ")";
 		}
+	}
+	public static int getRandomInt(int min, int max) {
+		Random r = new Random();
+		return r.nextInt(max - min + 1) + min;
 	}
 }

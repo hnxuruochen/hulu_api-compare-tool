@@ -8,7 +8,7 @@
                     <div class="ui large label">
                         Tag:
                     </div>
-                    <select class="ui search dropdown" ng-model="createData.tag">
+                    <select class="ui search dropdown" ng-model="createData.tagId">
                         <option value="">default</option>
                         <option ng-repeat="t in tags" value="{{t.id}}">{{t.name}}</option>
                     </select>
@@ -17,7 +17,7 @@
             <div class="field">
                 <div>
                     <div class="ui large label">
-                        Errors limit:
+                        Errors Limit:
                     </div>
                     <select class="ui search dropdown" ng-model="createData.errorsLimit">
                         <option value="">1</option>
@@ -41,14 +41,12 @@
                 </div>
             </div>
             <div class="field">
-                <div>
-                    <button class="ui primary button" style="margin-left:5px" ng-click="createTask()">
-                        Create
-                    </button>
-                    <button class="ui button green" ng-click="cancelTask()">
-                        Cancel
-                    </button>
-                </div>
+                <button class="ui primary button" style="margin-left:5px" ng-click="createTask()">
+                    Create
+                </button>
+                <button class="ui button green" ng-click="cancelTask()">
+                    Cancel
+                </button>
             </div>
         </div>
         <div class="ui divider"></div>
@@ -73,31 +71,25 @@
                 </div>
             </div>
             <div class="field">
-                <div class="ui large label" style="margin-top:10px;">
+                <div class="ui large label">
                     Requests:
                 </div>
-                <div style="margin-top:10px;">
-                    <textarea ng-model="createData.requests"></textarea>
-                </div>
+                <textarea ng-model="createData.requests"></textarea>
             </div>
         </div>
         <div class="field" ng-show="!createData.type">
             <div class="two fields">
                 <div class="field">
-                    <div class="ui large label" style="margin-top:10px;">
+                    <div class="ui large label">
                         Text 1:
                     </div>
-                    <div style="margin-top:10px;">
-                        <textarea ng-model="createData.text1"></textarea>
-                    </div>
+                    <textarea ng-model="createData.text1"></textarea>
                 </div>
                 <div class="field">
-                    <div class="ui large label" style="margin-top:10px;">
+                    <div class="ui large label">
                         Text 2:
                     </div>
-                    <div style="margin-top:10px;">
-                        <textarea ng-model="createData.text2"></textarea>
-                    </div>
+                    <textarea ng-model="createData.text2"></textarea>
                 </div>
             </div>
         </div>
@@ -148,7 +140,7 @@
 </div>
 <div class="ui divider"></div>
 <!-- Result table -->
-<table class="ui celled table" style="width: 90%; margin: auto;">
+<table class="ui selectable celled table" style="width: 90%; margin: auto;">
     <thead>
         <tr>
             <th style="width: 5%;">ID</th>
@@ -164,14 +156,14 @@
         <tr ng-repeat="t in searchResult" ng-class="{positive: t.status == 2 && t.errorsCount == 0, negative: t.status == 2 && t.errorsCount > 0, warning: t.status == 1}" ng-show="!searchData.preparingData">
             <td>{{t.id}}</td>
             <td>{{t.creator}}</td>
-            <td>{{tagsIdMap[t.tag].name}}</td>
+            <td>{{tagsIdMap[t.tagId].name}}</td>
             <td>{{types[t.type]}}</td>
             <td>{{t.errorsCount}}</td>
             <td>{{t.time}}</td>
-            <td style="cursor: pointer;">
-                <a style="color: inherit;" ng-href="/tasks/{{t.id}}">
+            <td>
                     {{status[t.status]}}
-                    <i class="chevron right icon" style="margin-left: 10px;"></i>
+                <a style="color: inherit; float: right;" ng-href="/tasks/{{t.id}}">                    
+                    <i class="chevron right icon"></i>
                 </a>
             </td>
         </tr>

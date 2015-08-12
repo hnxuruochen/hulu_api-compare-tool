@@ -1,0 +1,16 @@
+.mixed {
+	color: Chocolate;
+}
+.added {
+	color: green;
+}
+.deleted {
+	color: red;
+}
+.error-line {
+    white-space: pre;
+    word-spacing: 5px;
+}
+i {
+	cursor: pointer;
+}

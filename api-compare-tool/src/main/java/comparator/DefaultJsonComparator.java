@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,7 +20,7 @@ public class DefaultJsonComparator {
 	 *            Deep in json.
 	 * @return TAB_LEN * deep spaces.
 	 */
-	private String spaces(int deep) {
+	private static String spaces(int deep) {
 		if (deep == 0) {
 			return "";
 		} else {
@@ -35,7 +34,7 @@ public class DefaultJsonComparator {
 	 * @param json
 	 * @return List of key string.
 	 */
-	private List<String> getKeyList(JsonNode json) {
+	private static List<String> getKeyList(JsonNode json) {
 		List<String> list = new ArrayList<String>();
 		Iterator<String> iter = json.fieldNames();
 		while (iter.hasNext()) {
@@ -50,7 +49,7 @@ public class DefaultJsonComparator {
 	 * @param json
 	 * @return List of json node.
 	 */
-	private List<JsonNode> getNodeList(JsonNode json) {
+	private static List<JsonNode> getNodeList(JsonNode json) {
 		List<JsonNode> list = new ArrayList<JsonNode>();
 		Iterator<JsonNode> iter = json.elements();
 		while (iter.hasNext()) {
@@ -72,8 +71,8 @@ public class DefaultJsonComparator {
 	 *            Marker of the node.
 	 * @return Formatted output.
 	 */
-	private StringBuilder formatPrint(JsonNode node, String key, int deep,
-			String prefix) {
+	private static StringBuilder formatPrint(JsonNode node, String key,
+			int deep, String prefix) {
 		List<StringBuilder> subs = null;
 		StringBuilder now = new StringBuilder();
 		// Add object key.
@@ -85,7 +84,10 @@ public class DefaultJsonComparator {
 				subs.add(formatPrint(node.get(name), name + ": ", deep + 1,
 						prefix));
 			}
-			now.append(StringUtils.join(subs, ",\n")).append("\n");
+			now.append(StringUtils.join(subs, ",\n"));
+			if (!subs.isEmpty()) {
+				now.append("\n");
+			}
 			now.append(prefix).append(spaces(deep)).append("}");
 		} else if (node.isArray()) {
 			now.append("[\n");
@@ -93,7 +95,10 @@ public class DefaultJsonComparator {
 			for (JsonNode j : getNodeList(node)) {
 				subs.add(formatPrint(j, "", deep + 1, prefix));
 			}
-			now.append(StringUtils.join(subs, ",\n")).append("\n");
+			now.append(StringUtils.join(subs, ",\n"));
+			if (!subs.isEmpty()) {
+				now.append("\n");
+			}
 			now.append(prefix).append(spaces(deep)).append("]");
 		} else {
 			now.append(node.toString());
@@ -115,8 +120,8 @@ public class DefaultJsonComparator {
 	 *            deep in json.
 	 * @return Formatted output.
 	 */
-	private StringBuilder compareNode(JsonNode a, JsonNode b, String key,
-			int deep) {
+	private static StringBuilder compareNode(JsonNode a, JsonNode b,
+			String key, int deep) {
 		List<StringBuilder> subs = null;
 		StringBuilder now = new StringBuilder();
 		if (a.equals(b)) {
@@ -164,7 +169,7 @@ public class DefaultJsonComparator {
 			}
 			now.append('*').append(spaces(deep)).append(key).append("[\n");
 			now.append(StringUtils.join(subs, ",\n"));
-			now.append("\n").append('*').append(spaces(deep)).append("]");
+			now.append("\n*").append(spaces(deep)).append("]");
 		} else {
 			now.append(formatPrint(a, key, deep, "+"));
 			now.append(",\n");
@@ -175,17 +180,24 @@ public class DefaultJsonComparator {
 
 	/**
 	 * Convert two string to json, compare them and print the difference.
-	 * @param a The first string.
-	 * @param b The second string.
+	 * 
+	 * @param a
+	 *            The first string.
+	 * @param b
+	 *            The second string.
 	 * @return Formated output.
-	 * @throws JsonProcessingException
-	 * @throws IOException
 	 */
-	public String compare(String a, String b) throws JsonProcessingException,
-			IOException {
+	public static String compare(String a, String b) {
 		ObjectMapper mapper = new ObjectMapper();
-		JsonNode aj = mapper.readTree(a);
-		JsonNode bj = mapper.readTree(b);
-		return compareNode(aj, bj, "", 0).toString();
+		try {
+			JsonNode aj = mapper.readTree(a);
+			JsonNode bj = mapper.readTree(b);
+			return compareNode(aj, bj, "", 0).toString();
+		} catch (IOException e) {
+			return null;
+		}
+	}
+	public static String compare(JsonNode a, JsonNode b) {
+		return compareNode(a, b, "", 0).toString();
 	}
 }

@@ -17,9 +17,9 @@ mainApp.config(function($routeProvider, $locationProvider) {
             templateUrl: "templates/tasks_id.html",
             controller: "TasksIdController"
         })
-        .when("/errors", {
-            templateUrl: "templates/errors.html",
-            controller: "ErrorsController"
+        .when("/errors/:id", {
+            templateUrl: "templates/errors_id.html",
+            controller: "ErrorsIdController"
         })
         .when("/", {
             redirectTo: "/index"

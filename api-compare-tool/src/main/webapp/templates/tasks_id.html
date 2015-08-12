@@ -1,1 +1,114 @@
-{{id}}
+<div class="ui form" style="width:90%; margin: auto;" ng-class="{loading: loadingData}">
+    <div class="six fields">
+        <div class="field" style="width: 10%;">
+            <div class="ui large label" style="margin-right: 10px;">
+                ID:
+            </div>
+            {{task.id}}
+        </div>
+        <div class="field" style="width: 25%;">
+            <div class="ui large label" style="margin-right: 10px;">
+                Tag:
+            </div>
+            {{task.tagName}}
+        </div>
+        <div class="field" style="width: 15%;">
+            <div>
+                <div class="ui large label" style="margin-right: 10px;">
+                    Status:
+                </div>
+                <div class="ui large label" ng-class="{green: task.status == 2 && task.errorsCount == 0, red: task.status == 2 && task.errorsCount > 0, yellow: task.status == 1, grey: task.status == 0}">
+                    {{status[task.status]}}
+                </div>
+            </div>
+        </div>
+        <div class="field" style="width: 15%;">
+            <div class="ui large label" style="margin-right: 10px;">
+                Errors Count:
+            </div>
+            {{task.errorsCount}}
+        </div>
+        <div class="field" style="width: 15%;">
+            <div class="ui large label" style="margin-right: 10px;">
+                Errors Limit:
+            </div>
+            {{task.errorsLimit}}
+        </div>
+        <div class="field" style="width: 15%;">
+            <div class="ui large label" style="margin-right: 10px;">
+                Type:
+            </div>
+            {{types[task.type]}}
+        </div>
+    </div>
+    <div class="field" ng-if="task.type == 1">
+        <div class="two fields">
+            <div class="field">
+                <div class="ui labeled input">
+                    <div class="ui label">
+                        Address 1:
+                    </div>
+                    <input type="text" ng-model="task.param1" disabled="disabled">
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui labeled input">
+                    <div class="ui label">
+                        Address 2:
+                    </div>
+                    <input type="text" ng-model="task.param2" disabled="disabled">
+                </div>
+            </div>
+        </div>
+        <div class="field">
+            <div class="ui large label">
+                Requests:
+            </div>
+            <textarea ng-model="task.requests" disabled="disabled"></textarea>
+        </div>
+    </div>
+    <div class="field" ng-if="task.type == 0">
+        <div class="two fields">
+            <div class="field">
+                <div class="ui large label">
+                    Text 1:
+                </div>
+                <textarea ng-model="task.param1" disabled="disabled"></textarea>
+            </div>
+            <div class="field">
+                <div class="ui large label">
+                    Text 2:
+                </div>
+                <textarea ng-model="task.param2" disabled="disabled"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="ui divider"></div>
+    <table class="ui selectable celled table">
+        <thead>
+            <tr>
+                <th style="width: 10%;">Error ID</th>
+                <th style="width: 15%;">Time</th>
+                <th style="width: 40%;">Input</th>
+                <th style="width: 35%;">Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="e in task.errors">
+                <td> {{e.id}}</td>
+                <td>{{e.time}}</td>
+                <td>
+                    <div class="ui input transparent">
+                        <input type="text" value="{{e.input}}" disabled="disabled">
+                    </div>
+                </td>
+                <td>
+                    {{e.message}}
+                    <a style="color: inherit; float: right;" ng-href="/errors/{{e.id}}">
+                        <i class="chevron right icon"></i>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

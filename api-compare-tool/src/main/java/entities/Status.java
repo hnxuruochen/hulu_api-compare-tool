@@ -9,7 +9,7 @@ public class Status {
 		if (success) {
 			setMessage("Success.");
 		} else {
-			setMessage("Error.");
+			setMessage("Error! No data.");
 		}
 	}
 	public Status(Boolean success, String message) {
