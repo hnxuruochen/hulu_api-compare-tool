@@ -14,8 +14,10 @@ mainApp.controller("TasksController", function($scope, $rootScope, $http) {
         $scope.createData = {}
         $scope.createData.editBlock = false;
         $scope.createData.editStatus = "";
-        $scope.createData.tagId = "1";
-        $scope.createData.errorsLimit = "1";
+        $(".ui.dropdown.tag-id")
+            .dropdown("set selected", "1");
+        $(".ui.dropdown.errors-limit")
+            .dropdown("set selected", "1");
         $scope.createData.type = false;
         $scope.createData.text1 = "";
         $scope.createData.text2 = "";
@@ -24,7 +26,6 @@ mainApp.controller("TasksController", function($scope, $rootScope, $http) {
         $scope.createData.requests = "";
     };
     $scope.initializeSearchData();
-    $scope.initializeCreateData();
     // Load tags data.
     $http.get("/api/tags")
         .success(function(data) {
@@ -35,7 +36,6 @@ mainApp.controller("TasksController", function($scope, $rootScope, $http) {
             }
             $scope.searchData.preparingTags = false;
         });
-
     $scope.search = function() {
         $scope.searchData.preparingData = true;
         $http.get("/api/tasks/search", {
@@ -53,6 +53,7 @@ mainApp.controller("TasksController", function($scope, $rootScope, $http) {
             });
     };
     $scope.newTask = function() {
+        $scope.initializeCreateData();
         jq(".ui.modal.tasks")
             .modal({
                 closable: false
@@ -62,6 +63,10 @@ mainApp.controller("TasksController", function($scope, $rootScope, $http) {
     $scope.createTask = function() {
         var p1 = $scope.createData.text1;
         var p2 = $scope.createData.text2;
+        $scope.createData.errorsLimit = $(".ui.dropdown.errors-limit")
+            .dropdown("get value");
+        $scope.createData.tagId = $(".ui.dropdown.tag-id")
+            .dropdown("get value");
         if ($scope.createData.type) {
             p1 = $scope.createData.address1;
             p2 = $scope.createData.address2;
@@ -89,6 +94,5 @@ mainApp.controller("TasksController", function($scope, $rootScope, $http) {
     $scope.cancelTask = function() {
         jq(".ui.modal.tasks")
             .modal("hide");
-        $scope.initializeCreateData();
     };
 });

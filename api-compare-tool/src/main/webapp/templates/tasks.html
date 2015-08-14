@@ -8,8 +8,7 @@
                     <div class="ui large label">
                         Tag:
                     </div>
-                    <select class="ui search dropdown" ng-model="createData.tagId">
-                        <option value="">default</option>
+                    <select class="ui search dropdown tag-id">
                         <option ng-repeat="t in tags" value="{{t.id}}">{{t.name}}</option>
                     </select>
                 </div>
@@ -19,8 +18,7 @@
                     <div class="ui large label">
                         Errors Limit:
                     </div>
-                    <select class="ui search dropdown" ng-model="createData.errorsLimit">
-                        <option value="">1</option>
+                    <select class="ui search dropdown errors-limit">
                         <option value="1">1</option>
                         <option value="5">5</option>
                         <option value="10">10</option>
