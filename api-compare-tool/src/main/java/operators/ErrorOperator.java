@@ -36,4 +36,9 @@ public enum ErrorOperator {
 		String q = "INSERT INTO errors(task_id, time, message, input, output) VALUES (?, CURRENT_TIMESTAMP(), ?, ?, ?);";
 		template.update(q, taskId, message, input, output);				
 	}
+	
+	public void deleteErrorOfTask(int taskId) {
+		String q = "DELETE FROM errors WHERE task_id = ?;";
+		template.update(q, taskId);
+	}
 }

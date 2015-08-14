@@ -114,25 +114,35 @@ public class ApiController {
 	 */
 	@RequestMapping(value = "/api/tasks/new", method = RequestMethod.POST)
 	public TasksResponse newTask(HttpServletRequest request,
-			@RequestBody Task task)
-			throws JsonProcessingException, IOException {
+			@RequestBody Task task) throws JsonProcessingException, IOException {
 		String user = Utils.getUserName(request);
 		int id = TASK.newTask(user, task);
+		task.setId(id);
 		if (task.getType() == 0) {
-			String output = DefaultJsonComparator.compare(task.getParam1(), task.getParam2());
-			if ((output != null) && (!output.startsWith("*"))) {
-				TASK.updateTask(id, 0, 2);
-			} else {
-				String message = "Different json text.";
-				if (output == null) {
-					message = "Invalid json input.";
-				}
-				ERROR.newError(id, message, "Text compare.", output);
-				TASK.updateTask(id, 1, 2);
-			}
+			TASK.executeTextTask(task);
 		}
 		return new TasksResponse(new Status(true), TASK.searchTasks(null, null,
 				null, id).get(0));
+	}
+
+	@RequestMapping("/api/tasks/restart")
+	public Status restartTask(HttpServletRequest request,
+			@RequestParam(value = "id") Integer id) {
+		String user = Utils.getUserName(request);
+		Task task = TASK.getTask(id);
+		if (!user.equals(task.getCreator())) {
+			return new Status(false, "Not creator.");
+		}
+		if (task.getStatus() != 2) {
+			return new Status(false, "Task hasn't finished.");
+		}
+		ERROR.deleteErrorOfTask(task.getId());
+		if (task.getType() == 0) {
+			TASK.executeTextTask(task);
+		} else {
+			TASK.restartTask(id);
+		}
+		return new Status(true);
 	}
 
 	/**

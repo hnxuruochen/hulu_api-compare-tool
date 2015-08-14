@@ -14,6 +14,8 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import comparator.DefaultJsonComparator;
+
 import entities.Task;
 
 public enum TaskOperator {
@@ -98,8 +100,28 @@ public enum TaskOperator {
 		return id.getKey().intValue();
 	}
 
+	public void restartTask(int id) {
+		String q = "UPDATE tasks SET status = 0 WHERE id = ?";
+		template.update(q, id);
+	}
+
 	public void updateTask(int id, int errorsCount, int status) {
 		String q = "UPDATE tasks SET errors_count = ?, status = ? WHERE id = ?";
 		template.update(q, errorsCount, status, id);
+	}
+	
+	public void executeTextTask(Task task) {
+		String output = DefaultJsonComparator.compare(task.getParam1(),
+				task.getParam2());
+		if ((output != null) && (!output.startsWith("*"))) {
+			updateTask(task.getId(), 0, 2);
+		} else {
+			String message = "Different json text.";
+			if (output == null) {
+				message = "Invalid json input.";
+			}
+			ErrorOperator.INSTANCE.newError(task.getId(), message, "Text compare.", output);
+			updateTask(task.getId(), 1, 2);
+		}
 	}
 }

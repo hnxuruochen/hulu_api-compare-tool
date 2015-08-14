@@ -1,13 +1,13 @@
 <div class="ui form" style="width:90%; margin: auto;" ng-class="{loading: loadingData}">
     <!-- Basic task info -->
-    <div class="six fields">
+    <div class="fields">
         <div class="field" style="width: 10%;">
             <div class="ui large label" style="margin-right: 10px;">
                 ID:
             </div>
             {{task.id}}
         </div>
-        <div class="field" style="width: 25%;">
+        <div class="field" style="width: 20%;">
             <div class="ui large label" style="margin-right: 10px;">
                 Tag:
             </div>
@@ -40,6 +40,11 @@
                 Type:
             </div>
             {{types[task.type]}}
+        </div>
+        <div class="field" style="width: 5%;">
+            <button class="ui primary button" style="margin-right:10px" ng-click="restartTask()" ng-show="userData.userAccount == task.creator" ng-disabled="task.status != 2 || restartingTask">
+                Restart
+            </button>
         </div>
     </div>
     <!-- Service info -->
