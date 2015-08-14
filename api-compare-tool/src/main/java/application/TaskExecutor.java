@@ -24,7 +24,7 @@ public class TaskExecutor implements Runnable {
 	ObjectMapper objectMapper = null;
 	TaskMapper taskMapper = null;
 	ErrorOperator ERROR = ErrorOperator.INSTANCE;
-	
+
 	public TaskExecutor() throws SQLException {
 		// Initialize.
 		con = Database.getConneciont();
@@ -32,9 +32,9 @@ public class TaskExecutor implements Runnable {
 		taskMapper = new Task.TaskMapper(true);
 		objectMapper = new ObjectMapper();
 	}
-	
+
 	/**
-	 * Compare one uri of two apis. 
+	 * Compare one uri of two apis.
 	 */
 	private boolean compare(Task task, String uri) {
 		URL ua = null;
@@ -74,7 +74,7 @@ public class TaskExecutor implements Runnable {
 	}
 
 	/**
-	 * Execute a task. 
+	 * Execute a task.
 	 */
 	private void work(Task task) throws SQLException {
 		int errorsCount = 0;
@@ -104,8 +104,6 @@ public class TaskExecutor implements Runnable {
 				Task task = null;
 				if (rs.next()) {
 					task = taskMapper.mapRow(rs, 0);
-					Thread.sleep(30000);
-					System.out.println(task.getId());
 					st.execute("UPDATE tasks SET status = 1 WHERE id = "
 							+ task.getId());
 				}

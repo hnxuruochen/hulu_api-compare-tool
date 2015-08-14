@@ -15,7 +15,7 @@ mainApp.controller("TagsController", function($scope, $rootScope, $http) {
         });
     // Open tag editor.
     $scope.openModal = function() {
-        jq(".ui.modal")
+        jq(".ui.modal.tags")
             .modal({
                 closable: false,
                 onVisible: function() {
@@ -87,7 +87,7 @@ mainApp.controller("TagsController", function($scope, $rootScope, $http) {
         if ($scope.currentTag.name == null) {
             $scope.tags.pop();
         }
-        jq(".ui.modal")
+        jq(".ui.modal.tags")
             .modal("hide");
         $scope.editStatus = "";
     };

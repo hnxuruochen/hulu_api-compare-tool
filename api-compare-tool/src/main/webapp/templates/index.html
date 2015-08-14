@@ -1,1 +1,30 @@
 Home, just for fun.
+<div class="ui selection dropdown">
+  <input type="hidden" name="a">
+  <i class="dropdown icon a"></i>
+  <div class="text"></div>
+  <div class="menu" ng-model="a">
+    <div class="item" data-value="1">Male</div>
+    <div class="item" data-value="0">Female</div>
+  </div>
+</div>
+<select class="ui dropdown b" ng-model="b">
+  <option value="">Gender</option>
+  <option value="1">Male</option>
+  <option value="0">Female</option>
+</select>
+<button ng-click="a=a+1">aaa</button>
+<div>
+a: {{a}}
+</div>
+<div>
+b: {{b}}
+</div>
+
+<script>
+$(document).ready(function($) {
+    $(".ui.dropdown")
+        .dropdown();
+   $(".ui.selection").dropdown("set selected","0");
+});
+</script>

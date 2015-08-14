@@ -46,17 +46,17 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
     $scope.renderErrorView = function() {
     	// Initialize.
         var errorHtml = "";
-        var lines = $scope.error.output.split("\n");
+        $scope.error.output = $scope.error.output.split("\n");
+        var lines = $scope.error.output;
         $scope.lineStyle = [];
         // Add html one line by one line.
         for (var i = 0; i < lines.length; i++) {
-            var line = lines[i];
             var style = {};
-            style.color = $scope.getColor(line.charAt(0));
+            style.color = $scope.getColor(lines[i].charAt(0));
             // Caculate margin.
-            style.margin = line.length - 1;
-            line = line.substring(1, line.length).trim();
-            style.margin -= line.length;
+            style.margin = lines[i].length - 1;
+            lines[i] = lines[i].substring(1, lines[i].length).trim();
+            style.margin -= lines[i].length;
             style.margin *= 5;
             // Spell line html.
             var blockStart = "";
@@ -64,11 +64,11 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
             var body = "";
             var omit = "<span ng-show=\"!lineStyle[" + i + "].expand\" style=\"margin-right: " + (-style.margin - 20) + "px;\">";
             var br = "</br>";
-            if ($scope.isContentEnd(line) && !$scope.isContentStart(lines[i - 1])) {
+            if ($scope.isContentEnd(lines[i]) && !$scope.isContentStart(lines[i - 1])) {
                 // End a sub content area.
                 blockEnd = "</span>";
             }
-            if ($scope.isContentStart(line)) {
+            if ($scope.isContentStart(lines[i])) {
                 if (!$scope.isContentEnd(lines[i + 1])) {
                     // Show mixed content by default.
                     style.expand = style.color == " mixed";
@@ -91,7 +91,7 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
             }
             omit = omit + "</span>";
             // Line content.
-            body = body + "<span>" + line + "</span>" + omit;
+            body = body + "<span>{{error.output[" + i + "]}}</span>" + omit;
             // Wrap div with color and margin.
             body = "<span class=\"error-line " + style.color + "\" style=\"margin-left: " + style.margin + "px;\">" + body + "</span>";
             // Add end and start tag, breakline.
