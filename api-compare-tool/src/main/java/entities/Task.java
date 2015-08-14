@@ -36,16 +36,16 @@ public class Task {
 
 	private Integer id = null;
 	private String creator = null;
-	private Integer tagId = null;
+	private Integer tagId = 1;
 	private String tagName = null;
 	private String time = null;
-	private String param1 = null;
-	private String param2 = null;
-	private String requests = null;
-	private Integer type = null;
-	private Integer errorsLimit = null;
-	private Integer errorsCount = null;
-	private Integer status = null;
+	private String param1 = "";
+	private String param2 = "";
+	private String requests = "";
+	private Integer type = 0;
+	private Integer errorsLimit = 1;
+	private Integer errorsCount = 0;
+	private Integer status = 0;
 	private List<Error> errors = null;
 
 	public void setId(Integer id) {

@@ -1,17 +1,18 @@
 "use strict";
 mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $compile) {
     $scope.loadingData = true;
-
+    // Load error data.
     $http.get("/api/errors/" + $routeParams.id)
         .success(function(data) {
             $scope.error = data.error;
             $scope.loadingData = false;
             $scope.renderErrorView();
         });
-
+    // Expand or collapse a block.
     $scope.toggleExpand = function(line) {
         $scope.lineStyle[line].expand = !$scope.lineStyle[line].expand;
     }
+    // Check whether a line is a block start.
     $scope.isContentStart = function(line) {
         var c = line.charAt(line.length - 1);
         if ((c == '[') || (c == '{')) {
@@ -19,6 +20,7 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
         }
         return false;
     }
+    // Check whether a line is a block end.
     $scope.isContentEnd = function(line) {
         var c = line.charAt(line.length - 1);
         // Skip ',' seperator.
@@ -30,6 +32,7 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
         }
         return false;
     }
+    // Specify a color for each mark.
     $scope.getColor = function(c) {
         if (c == '*') {
             return " mixed";
@@ -41,9 +44,11 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
         return "";
     }
     $scope.renderErrorView = function() {
+    	// Initialize.
         var errorHtml = "";
         var lines = $scope.error.output.split("\n");
         $scope.lineStyle = [];
+        // Add html one line by one line.
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
             var style = {};
@@ -65,7 +70,7 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
             }
             if ($scope.isContentStart(line)) {
                 if (!$scope.isContentEnd(lines[i + 1])) {
-                    // Don't show same content by default.
+                    // Show mixed content by default.
                     style.expand = style.color == " mixed";
                     // Add expand button.
                     body = "<span ng-click=\"toggleExpand(" + i + ")\">";
@@ -81,7 +86,7 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
                 }
             }
             if (body == "") {
-                // Add same width as exp  and tag.
+                // Add same width as exp and tag.
                 style.margin = style.margin + 20;
             }
             omit = omit + "</span>";
@@ -94,6 +99,7 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
             errorHtml = errorHtml + body;
             $scope.lineStyle.push(style);
         }
+        // Compile html code.
         var ele = angular.element(document.getElementById("display-error"));
         ele.append(errorHtml);
         $compile(ele)($scope);

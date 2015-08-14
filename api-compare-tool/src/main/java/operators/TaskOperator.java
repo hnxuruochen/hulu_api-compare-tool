@@ -75,8 +75,7 @@ public enum TaskOperator {
 		return task;
 	}
 
-	public int newTask(String creator, Integer tag, Integer errorsLimit,
-			Integer type, String param1, String param2, String requests) {
+	public int newTask(String creator, Task task) {
 		String q = "INSERT INTO tasks(creator, tag_id, time, type, param1, param2, requests, errors_limit) VALUES (?, ?, CURRENT_TIMESTAMP(), ?, ?, ?, ?, ?);";
 		// Get auto generated primary key.
 		KeyHolder id = new GeneratedKeyHolder();
@@ -87,12 +86,12 @@ public enum TaskOperator {
 				PreparedStatement ps = con.prepareStatement(q,
 						Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, creator);
-				ps.setInt(2, tag);
-				ps.setInt(3, type);
-				ps.setString(4, param1);
-				ps.setString(5, param2);
-				ps.setString(6, requests);
-				ps.setInt(7, errorsLimit);
+				ps.setInt(2, task.getTagId());
+				ps.setInt(3, task.getType());
+				ps.setString(4, task.getParam1());
+				ps.setString(5, task.getParam2());
+				ps.setString(6, task.getRequests());
+				ps.setInt(7, task.getErrorsLimit());
 				return ps;
 			}
 		}, id);

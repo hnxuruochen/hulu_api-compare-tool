@@ -1,3 +1,3 @@
 "use strict";
-mainApp.controller("IndexController", function($scope, $routeParams) {
+mainApp.controller("IndexController", function($scope) {
 });

@@ -73,11 +73,9 @@ mainApp.controller("TagsController", function($scope, $rootScope, $http) {
                         .modal("hide");
                     $scope.editStatus = "";
                 }
-            })
-            .error(function() {
-                $scope.editStatus = "Connection failed."
-            })
-            .finally(function() {
+            }).error(function() {
+                $scope.editStatus = "Connection error.";
+            }).finally(function() {
                 $scope.editBlock = false;
                 setTimeout(function() {
                     jq(".modal input").focus();

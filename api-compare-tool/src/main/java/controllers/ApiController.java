@@ -10,13 +10,15 @@ import operators.TagOperator;
 import operators.TaskOperator;
 
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import comparator.DefaultJsonComparator;
 
+import comparator.DefaultJsonComparator;
 import responses.ErrorsResponse;
 import responses.TagResponse;
 import responses.TasksResponse;
@@ -110,27 +112,24 @@ public class ApiController {
 	 * @throws JsonProcessingException
 	 * @throws IOException
 	 */
-	@RequestMapping("/api/tasks/new")
+	@RequestMapping(value = "/api/tasks/new", method = RequestMethod.POST)
 	public TasksResponse newTask(HttpServletRequest request,
-			@RequestParam(value = "tag_id") Integer tagId,
-			@RequestParam(value = "errors_limit") Integer errorsLimit,
-			@RequestParam(value = "type") Boolean type,
-			@RequestParam(value = "param1") String param1,
-			@RequestParam(value = "param2") String param2,
-			@RequestParam(value = "requests") String requests)
+			@RequestBody Task task)
 			throws JsonProcessingException, IOException {
 		String user = Utils.getUserName(request);
-		int t = type ? 1 : 0;
-		int id = TASK.newTask(user, tagId, errorsLimit, t, param1, param2,
-				requests);
-		if (t == 0) {
-			String output = DefaultJsonComparator.compare(param1, param2);
-			String message = "Different json text.";
-			if (output == null) {
-				message = "Invalid json input.";
+		int id = TASK.newTask(user, task);
+		if (task.getType() == 0) {
+			String output = DefaultJsonComparator.compare(task.getParam1(), task.getParam2());
+			if ((output != null) && (!output.startsWith("*"))) {
+				TASK.updateTask(id, 0, 2);
+			} else {
+				String message = "Different json text.";
+				if (output == null) {
+					message = "Invalid json input.";
+				}
+				ERROR.newError(id, message, "Text compare.", output);
+				TASK.updateTask(id, 1, 2);
 			}
-			ERROR.newError(id, message, "Text compare.", output);
-			TASK.updateTask(id, 1, 2);
 		}
 		return new TasksResponse(new Status(true), TASK.searchTasks(null, null,
 				null, id).get(0));

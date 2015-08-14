@@ -24,7 +24,18 @@ public class TaskExecutor implements Runnable {
 	ObjectMapper objectMapper = null;
 	TaskMapper taskMapper = null;
 	ErrorOperator ERROR = ErrorOperator.INSTANCE;
-
+	
+	public TaskExecutor() throws SQLException {
+		// Initialize.
+		con = Database.getConneciont();
+		con.setAutoCommit(false);
+		taskMapper = new Task.TaskMapper(true);
+		objectMapper = new ObjectMapper();
+	}
+	
+	/**
+	 * Compare one uri of two apis. 
+	 */
 	private boolean compare(Task task, String uri) {
 		URL ua = null;
 		try {
@@ -62,6 +73,9 @@ public class TaskExecutor implements Runnable {
 		return true;
 	}
 
+	/**
+	 * Execute a task. 
+	 */
 	private void work(Task task) throws SQLException {
 		int errorsCount = 0;
 		String[] requests = task.getRequests().split("\n");
@@ -79,23 +93,19 @@ public class TaskExecutor implements Runnable {
 		st.close();
 	}
 
-	public TaskExecutor() throws SQLException {
-		con = Database.getConneciont();
-		con.setAutoCommit(false);
-		taskMapper = new Task.TaskMapper(true);
-		objectMapper = new ObjectMapper();
-	}
-
 	@Override
 	public void run() {
 		try {
 			while (true) {
+				// Fetch a task and mark status.
 				Statement st = con.createStatement();
 				String q = "SELECT * FROM tasks WHERE status = 0 AND type = 1 LIMIT 1;";
 				ResultSet rs = st.executeQuery(q);
 				Task task = null;
 				if (rs.next()) {
 					task = taskMapper.mapRow(rs, 0);
+					Thread.sleep(30000);
+					System.out.println(task.getId());
 					st.execute("UPDATE tasks SET status = 1 WHERE id = "
 							+ task.getId());
 				}

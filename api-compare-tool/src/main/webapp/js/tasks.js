@@ -67,15 +67,13 @@ mainApp.controller("TasksController", function($scope, $rootScope, $http) {
             p2 = $scope.createData.address2;
         }
         $scope.createData.editBlock = true;
-        $http.get("/api/tasks/new", {
-                params: {
-                    tag_id: $scope.createData.tagId,
-                    errors_limit: $scope.createData.errorsLimit,
-                    type: $scope.createData.type,
-                    param1: p1,
-                    param2: p2,
-                    requests: $scope.createData.requests
-                }
+        $http.post("/api/tasks/new", {
+                tag_id: $scope.createData.tagId,
+                errors_limit: $scope.createData.errorsLimit,
+                type: $scope.createData.type ? 1 : 0,
+                param1: p1,
+                param2: p2,
+                requests: $scope.createData.requests
             })
             .success(function(data) {
                 $scope.searchResult.unshift(data.task);

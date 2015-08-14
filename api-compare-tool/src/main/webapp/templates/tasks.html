@@ -96,9 +96,7 @@
         <!-- Status info -->
         <div class="field">
             <div class="ui center aligned container">
-                <a class="ui red label" ng-show="createData.editStatus != ''">
-                    {{createData.editStatus}}
-                </a>
+                <a class="ui red label" ng-show="createData.editStatus != ''">{{createData.editStatus}}</a>
             </div>
         </div>
     </div>
@@ -161,8 +159,8 @@
             <td>{{t.errorsCount}}</td>
             <td>{{t.time}}</td>
             <td>
-                    {{status[t.status]}}
-                <a style="color: inherit; float: right;" ng-href="/tasks/{{t.id}}">                    
+                {{status[t.status]}}
+                <a style="color: inherit; float: right;" ng-href="/tasks/{{t.id}}">
                     <i class="chevron right icon"></i>
                 </a>
             </td>

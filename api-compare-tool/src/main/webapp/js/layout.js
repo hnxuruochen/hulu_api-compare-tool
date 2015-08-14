@@ -3,6 +3,7 @@ var jq = angular.element;
 
 var mainApp = angular.module("mainApp", ["ngRoute"]);
 mainApp.controller("headerController", function($scope, $rootScope, $http) {
+	// Initialize.
     $rootScope.types = ["Text", "Service"];
     $rootScope.status = ["Waiting", "Running", "Finished"];
     $rootScope.searchResult = [];

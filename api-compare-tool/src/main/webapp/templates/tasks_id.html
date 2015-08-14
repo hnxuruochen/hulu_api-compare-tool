@@ -1,4 +1,5 @@
 <div class="ui form" style="width:90%; margin: auto;" ng-class="{loading: loadingData}">
+    <!-- Basic task info -->
     <div class="six fields">
         <div class="field" style="width: 10%;">
             <div class="ui large label" style="margin-right: 10px;">
@@ -41,6 +42,7 @@
             {{types[task.type]}}
         </div>
     </div>
+    <!-- Service info -->
     <div class="field" ng-if="task.type == 1">
         <div class="two fields">
             <div class="field">
@@ -67,6 +69,7 @@
             <textarea ng-model="task.requests" disabled="disabled"></textarea>
         </div>
     </div>
+    <!-- Text info -->
     <div class="field" ng-if="task.type == 0">
         <div class="two fields">
             <div class="field">
@@ -84,6 +87,7 @@
         </div>
     </div>
     <div class="ui divider"></div>
+    <!-- Errors table -->
     <table class="ui selectable celled table">
         <thead>
             <tr>
