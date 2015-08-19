@@ -87,8 +87,8 @@
                 </div>
                 <div style="line-height: 36px;">
                     <label style="margin-left:10px; margin-right: 10px;">Text</label>
-                    <div class="ui toggle checkbox">
-                        <input type="checkbox" name="public" ng-model="task.type" ng-disabled="savingTask || !editingTask">
+                    <div id="type-selector" class="ui toggle checkbox">
+                        <input type="checkbox" name="type" ng-disabled="savingTask || !editingTask">
                         <label>Service</label>
                     </div>
                 </div>
@@ -107,7 +107,7 @@
         </div>
     </div>
     <!-- Service info -->
-    <div class="field" ng-if="task.type == 1">
+    <div class="field" id="service-info">
         <div class="two fields">
             <div class="field">
                 <div class="ui labeled input">
@@ -134,7 +134,7 @@
         </div>
     </div>
     <!-- Text info -->
-    <div class="field" ng-if="task.type == 0">
+    <div class="field" id="text-info">
         <div class="two fields">
             <div class="field">
                 <div class="ui large label">

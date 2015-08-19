@@ -1,17 +1,22 @@
 "use strict";
 mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $location) {
     // Initialize task view with task object.
+    $scope.typeSelector = $("#type-selector");
+    $scope.serviceInfo = $("#service-info");
+    $scope.textInfo = $("#text-info");
+    $scope.toggleTypeView = function() {
+        $scope.serviceInfo.toggleClass("hide");
+        $scope.textInfo.toggleClass("hide");
+    };
     $scope.initializeTask = function() {
-        if ($scope.task.type) {
+        if ($scope.task.type == 1) {
             $scope.task.address1 = $scope.task.param1;
             $scope.task.address2 = $scope.task.param2;
-            $(".ui.checkbox.toggle")
-                .checkbox("check");
+            $scope.textInfo.addClass("hide");
         } else {
             $scope.task.text1 = $scope.task.param1;
             $scope.task.text2 = $scope.task.param2;
-            $(".ui.checkbox.toggle")
-                .checkbox("uncheck");
+            $scope.serviceInfo.addClass("hide");
         }
         $(".ui.dropdown.errors-limit")
             .dropdown("set selected", $scope.task.errorsLimit);
@@ -41,7 +46,7 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
         $scope.task.param1 = "";
         $scope.task.param2 = "";
         $scope.task.requests = "";
-        $scope.task.type = false;
+        $scope.task.type = 0;
         $scope.task.errorsLimit = 1;
         $scope.initializeTask();
     };
@@ -81,7 +86,7 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
             .dropdown("get value");
         $scope.task.tagId = $(".ui.dropdown.tags")
             .dropdown("get value");
-        if ($scope.task.type) {
+        if ($scope.task.type == 1) {
             $scope.task.param1 = $scope.task.address1;
             $scope.task.param2 = $scope.task.address2;
         } else {
@@ -91,7 +96,7 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
         var params = {
             tagId: $scope.task.tagId,
             errorsLimit: $scope.task.errorsLimit,
-            type: $scope.task.type ? 1 : 0,
+            type: $scope.task.type,
             param1: $scope.task.param1,
             param2: $scope.task.param2,
             requests: $scope.task.requests
@@ -120,4 +125,12 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
                 });
         }
     };
+
+    $scope.typeSelector
+        .checkbox({
+            onChange: function() {
+                $scope.task.type = 1 - $scope.task.type;
+                $scope.toggleTypeView();
+            }
+        });
 });
