@@ -2,12 +2,12 @@
 mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $location) {
     // Initialize task view with task object.
     $scope.initializeTask = function() {
-        if ($scope.task.type == 0) {
-            $scope.task.text1 = $scope.task.param1;
-            $scope.task.text2 = $scope.task.param2;
-        } else {
+        if ($scope.task.type) {
             $scope.task.address1 = $scope.task.param1;
             $scope.task.address1 = $scope.task.param2;
+        } else {
+            $scope.task.text1 = $scope.task.param1;
+            $scope.task.text2 = $scope.task.param2;
         }
         $(".ui.dropdown.errors-limit")
             .dropdown("set selected", $scope.task.errorsLimit);
@@ -37,7 +37,7 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
         $scope.task.param1 = "";
         $scope.task.param2 = "";
         $scope.task.requests = "";
-        $scope.task.type = 0;
+        $scope.task.type = false;
         $scope.task.errorsLimit = 1;
         $scope.initializeTask();
     };
@@ -77,17 +77,17 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
             .dropdown("get value");
         $scope.task.tagId = $(".ui.dropdown.tags")
             .dropdown("get value");
-        if ($scope.task.type == 0) {
-            $scope.task.param1 = $scope.task.text1;
-            $scope.task.param2 = $scope.task.text2;
-        } else {
+        if ($scope.task.type) {
             $scope.task.param1 = $scope.task.address1;
             $scope.task.param2 = $scope.task.address2;
+        } else {
+            $scope.task.param1 = $scope.task.text1;
+            $scope.task.param2 = $scope.task.text2;
         }
         var params = {
             tagId: $scope.task.tagId,
             errorsLimit: $scope.task.errorsLimit,
-            type: $scope.task.type,
+            type: $scope.task.type ? 1 : 0,
             param1: $scope.task.param1,
             param2: $scope.task.param2,
             requests: $scope.task.requests
