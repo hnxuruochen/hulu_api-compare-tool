@@ -7,6 +7,17 @@ import java.util.List;
 import org.springframework.jdbc.core.RowMapper;
 
 public class Task {
+	public class Status {
+		public static final int PREPARING = 0;
+		public static final int WATING = 1;
+		public static final int RUNNING = 2;
+		public static final int FINISHED = 3;
+	}
+	public class Type {
+		public static final int TEXT = 0;
+		public static final int SERVICE = 1;
+	}
+
 	public static class TaskMapper implements RowMapper<Task> {
 		private boolean fullData = false;
 
@@ -37,7 +48,6 @@ public class Task {
 	private Integer id = null;
 	private String creator = null;
 	private Integer tagId = 1;
-	private String tagName = null;
 	private String time = null;
 	private String param1 = "";
 	private String param2 = "";
@@ -45,7 +55,7 @@ public class Task {
 	private Integer type = 0;
 	private Integer errorsLimit = 1;
 	private Integer errorsCount = 0;
-	private Integer status = 0;
+	private Integer status = Status.WATING;
 	private List<Error> errors = null;
 
 	public void setId(Integer id) {
@@ -58,10 +68,6 @@ public class Task {
 
 	public void setTagId(Integer tagId) {
 		this.tagId = tagId;
-	}
-
-	public void setTagName(String tagName) {
-		this.tagName = tagName;
 	}
 
 	public void setTime(String time) {
@@ -95,7 +101,7 @@ public class Task {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
-	
+
 	public void setErrors(List<Error> errors) {
 		this.errors = errors;
 	}
@@ -110,10 +116,6 @@ public class Task {
 
 	public Integer getTagId() {
 		return tagId;
-	}
-
-	public String getTagName() {
-		return tagName;
 	}
 
 	public String getTime() {
@@ -147,7 +149,7 @@ public class Task {
 	public Integer getStatus() {
 		return status;
 	}
-	
+
 	public List<Error> getErrors() {
 		return errors;
 	}

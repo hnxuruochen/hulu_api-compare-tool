@@ -21,7 +21,7 @@
     </div>
 </div>
 <!-- Tags table -->
-<table class="ui celled table" ng-show="!preparingData">
+<table class="ui celled table" ng-show="!loadingTags">
     <thead>
         <tr>
             <th style="width: 33%">
@@ -55,4 +55,4 @@
     </tbody>
 </table>
 <!-- Loader -->
-<div class="ui active centered large inline loader" style="margin-top: 100px;" ng-show="preparingData"></div>
+<div class="ui active centered large inline loader" style="margin-top: 100px;" ng-show="loadingTags"></div>

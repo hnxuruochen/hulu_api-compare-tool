@@ -8,14 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import comparator.DefaultJsonComparator;
-
 import entities.Task;
 
 public enum TaskOperator {
@@ -64,20 +63,14 @@ public enum TaskOperator {
 		Task task = null;
 		try {
 			task = template.queryForObject(q, new Task.TaskMapper(true), id);
-		} catch (DataAccessException e) {
+		} catch (EmptyResultDataAccessException e) {
 			return null;
-		}
-		q = "SELECT name FROM tags WHERE id = ?;";
-		try {
-			task.setTagName(template.queryForObject(q, String.class,
-					task.getTagId()));
-		} catch (DataAccessException e) {
 		}
 		task.setErrors(ErrorOperator.INSTANCE.getErrors(id));
 		return task;
 	}
 
-	public int newTask(String creator, Task task) {
+	public int newTask(Task task) {
 		String q = "INSERT INTO tasks(creator, tag_id, time, type, param1, param2, requests, errors_limit) VALUES (?, ?, CURRENT_TIMESTAMP(), ?, ?, ?, ?, ?);";
 		// Get auto generated primary key.
 		KeyHolder id = new GeneratedKeyHolder();
@@ -87,7 +80,7 @@ public enum TaskOperator {
 					throws SQLException {
 				PreparedStatement ps = con.prepareStatement(q,
 						Statement.RETURN_GENERATED_KEYS);
-				ps.setString(1, creator);
+				ps.setString(1, task.getCreator());
 				ps.setInt(2, task.getTagId());
 				ps.setInt(3, task.getType());
 				ps.setString(4, task.getParam1());
@@ -100,28 +93,37 @@ public enum TaskOperator {
 		return id.getKey().intValue();
 	}
 
-	public void restartTask(int id) {
-		String q = "UPDATE tasks SET status = 0 WHERE id = ?";
-		template.update(q, id);
+	public void updateTask(Task task) {
+		String q = "UPDATE tasks SET tag_id = ?, time = CURRENT_TIMESTAMP(), type = ?, param1 = ?, param2 = ?, requests = ?, errors_limit = ? WHERE id = ?;";
+		template.update(q, task.getTagId(), task.getType(), task.getParam1(),
+				task.getParam2(), task.getRequests(), task.getErrorsLimit(),
+				task.getId());
 	}
 
 	public void updateTask(int id, int errorsCount, int status) {
 		String q = "UPDATE tasks SET errors_count = ?, status = ? WHERE id = ?";
 		template.update(q, errorsCount, status, id);
 	}
-	
+
+	public void restartTask(int id) {
+		String q = "UPDATE tasks SET status = " + Task.Status.WATING
+				+ " WHERE id = ?";
+		template.update(q, id);
+	}
+
 	public void executeTextTask(Task task) {
 		String output = DefaultJsonComparator.compare(task.getParam1(),
 				task.getParam2());
 		if ((output != null) && (!output.startsWith("*"))) {
-			updateTask(task.getId(), 0, 2);
+			updateTask(task.getId(), 0, Task.Status.FINISHED);
 		} else {
 			String message = "Different json text.";
 			if (output == null) {
 				message = "Invalid json input.";
 			}
-			ErrorOperator.INSTANCE.newError(task.getId(), message, "Text compare.", output);
-			updateTask(task.getId(), 1, 2);
+			ErrorOperator.INSTANCE.newError(task.getId(), message,
+					"Text compare.", output);
+			updateTask(task.getId(), 1, Task.Status.FINISHED);
 		}
 	}
 }

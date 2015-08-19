@@ -10,8 +10,8 @@ import java.sql.Statement;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import comparator.DefaultJsonComparator;
 
+import comparator.DefaultJsonComparator;
 import entities.Task;
 import entities.Task.TaskMapper;
 import operators.Database;
@@ -88,8 +88,9 @@ public class TaskExecutor implements Runnable {
 			}
 		}
 		Statement st = con.createStatement();
-		st.execute("UPDATE tasks SET status = 2, errors_count = " + errorsCount
-				+ " WHERE id = " + task.getId());
+		st.execute("UPDATE tasks SET status = " + Task.Status.FINISHED
+				+ ", errors_count = " + errorsCount + " WHERE id = "
+				+ task.getId());
 		st.close();
 	}
 
@@ -99,12 +100,15 @@ public class TaskExecutor implements Runnable {
 			while (true) {
 				// Fetch a task and mark status.
 				Statement st = con.createStatement();
-				String q = "SELECT * FROM tasks WHERE status = 0 AND type = 1 LIMIT 1;";
+				String q = "SELECT * FROM tasks WHERE status = "
+						+ Task.Status.WATING + " AND type = "
+						+ Task.Type.SERVICE + " LIMIT 1;";
 				ResultSet rs = st.executeQuery(q);
 				Task task = null;
 				if (rs.next()) {
 					task = taskMapper.mapRow(rs, 0);
-					st.execute("UPDATE tasks SET status = 1 WHERE id = "
+					st.execute("UPDATE tasks SET status = "
+							+ Task.Status.RUNNING + " WHERE id = "
 							+ task.getId());
 				}
 				rs.close();

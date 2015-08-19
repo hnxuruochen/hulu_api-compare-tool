@@ -44,6 +44,9 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
         return "";
     }
     $scope.renderErrorView = function() {
+        if ($scope.error.output == null) {
+            return;
+        }
     	// Initialize.
         var errorHtml = "";
         $scope.error.output = $scope.error.output.split("\n");

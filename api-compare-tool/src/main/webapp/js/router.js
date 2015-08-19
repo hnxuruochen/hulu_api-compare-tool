@@ -13,6 +13,10 @@ mainApp.config(function($routeProvider, $locationProvider) {
             templateUrl: "templates/tasks.html",
             controller: "TasksController"
         })
+        .when("/tasks/new", {
+            templateUrl: "templates/tasks_id.html",
+            controller: "TasksIdController"
+        })        
         .when("/tasks/:id", {
             templateUrl: "templates/tasks_id.html",
             controller: "TasksIdController"

@@ -1,9 +1,17 @@
 package operators;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
 import entities.Tag;
 
@@ -20,33 +28,46 @@ public enum TagOperator {
 		return template.query(q, new Tag.TagMapper());
 	}
 
-	public Tag addTag(String name, String user) {
+	public Integer addTag(String name, String user) {
 		String q = "INSERT INTO tags(name, creator, time) VALUES (?, ?, CURRENT_TIMESTAMP());";
-		template.update(q, name, user);
-		q = "SELECT * FROM tags WHERE name = ?";
-		return template.queryForObject(q, new Tag.TagMapper(), name);
-	}
-
-	public String getTagCreator(Integer id) {
-		String q = "SELECT creator FROM tags WHERE id = ?";
-		String output = null;
+		KeyHolder id = new GeneratedKeyHolder();
 		try {
-			output = template.queryForObject(q, String.class, id);
-		} catch (DataAccessException e) {
+			template.update(new PreparedStatementCreator() {
+				@Override
+				public PreparedStatement createPreparedStatement(Connection con)
+						throws SQLException {
+					PreparedStatement ps = con.prepareStatement(q,
+							Statement.RETURN_GENERATED_KEYS);
+					ps.setString(1, name);
+					ps.setString(2, user);
+					return ps;
+				}
+			}, id);
+		} catch (DuplicateKeyException e) {
+			return null;
 		}
-		return output;
+		return id.getKey().intValue();
 	}
 
-	public boolean existName(String name) {
-		String q = "SELECT count(*) FROM tags WHERE name = ?";
-		return template.queryForObject(q, Integer.class, name) > 0;
+	public Tag getTagById(int id) {
+		String q = "SELECT * FROM tags WHERE id = ?";
+		Tag tag = null;
+		try {
+		tag = template.queryForObject(q, new Tag.TagMapper(), id);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		return tag;
 	}
 
-	public Tag updateTag(Integer id, String name) {
+	public boolean updateTag(Integer id, String name) {
 		String q = "UPDATE tags SET name = ?, time = CURRENT_TIMESTAMP() WHERE id = ?";
-		template.update(q, name, id);
-		q = "SELECT * FROM tags WHERE id = ?";
-		return template.queryForObject(q, new Tag.TagMapper(), id);
+		try {
+			template.update(q, name, id);
+		} catch (DuplicateKeyException e) {
+			return false;
+		}
+		return true;
 	}
 
 	public void deleteTag(Integer id) {

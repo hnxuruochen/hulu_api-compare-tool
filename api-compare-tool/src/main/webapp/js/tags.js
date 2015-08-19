@@ -1,94 +1,119 @@
 "use strict";
-mainApp.controller("TagsController", function($scope, $rootScope, $http) {
+mainApp.controller("TagsController", function($scope, $http) {
     // Initialize.
-    $scope.preparingData = true;
     $scope.tagName = "";
     $scope.editStatus = "";
-    $scope.currentTag = null;
+    $scope.currentIndex = null;
     $scope.editBlock = false;
     $scope.removingTag = false;
-    // Load data.
-    $http.get("/api/tags")
-        .success(function(data) {
-            $scope.preparingData = false;
-            $scope.tags = data;
-        });
     // Open tag editor.
     $scope.openModal = function() {
-        jq(".ui.modal.tags")
+        $(".ui.modal.tags")
             .modal({
                 closable: false,
                 onVisible: function() {
                     setTimeout(function() {
-                        jq(".modal input").focus();
+                        $(".modal input").focus();
                     }, 1);
                 }
             })
             .modal("show");
-    }
+    };
+    $scope.closeModal = function() {
+        $(".ui.modal")
+            .modal("hide");
+        $scope.editStatus = "";
+    };
     $scope.addTag = function() {
         $scope.removingTag = false;
         var tag = {}
         tag.id = null;
         $scope.tags.push(tag);
         $scope.tagName = "";
-        $scope.currentTag = tag;
+        $scope.currentIndex = $scope.tags.indexOf(tag);
         $scope.openModal();
     }
     $scope.editTag = function(t) {
         $scope.removingTag = false;
-        $scope.currentTag = t;
+        $scope.currentIndex = $scope.tags.indexOf(t);
         $scope.tagName = t.name;
         $scope.openModal();
     };
     $scope.removeTag = function(t) {
         $scope.removingTag = true;
-        $scope.currentTag = t;
+        $scope.currentIndex = $scope.tags.indexOf(t);
         $scope.tagName = t.name;
         $scope.openModal();
     }
     $scope.saveTag = function() {
         $scope.editStatus = "Waiting please.";
-        $scope.editBlock = true;
-        var name = $scope.tagName;
         if ($scope.removingTag) {
-            name = null;
-        }
-        $http.get("/api/tags/modify", {
-                params: {
-                    id: $scope.currentTag.id,
-                    name: name
-                }
-            })
-            .success(function(data) {
-                $scope.editStatus = data.status.message;
-                if (data.status.success) {
-                    var p = $scope.tags.indexOf($scope.currentTag);
-                    if ($scope.removingTag) {
-                        $scope.tags.splice(p, 1);
-                    } else {
-                        $scope.tags[p] = data.tag;
+            // Delete.
+            $http.get("/api/tags/delete", {
+                    params: {
+                        id: $scope.tags[$scope.currentIndex].id,
                     }
-                    jq(".ui.modal")
-                        .modal("hide");
-                    $scope.editStatus = "";
-                }
-            }).error(function() {
-                $scope.editStatus = "Connection error.";
-            }).finally(function() {
-                $scope.editBlock = false;
-                setTimeout(function() {
-                    jq(".modal input").focus();
-                }, 1);
-
-            });
+                })
+                .success(function(data) {
+                    $scope.editStatus = data.message;
+                    if (data.success) {
+                        $scope.tags.splice($scope.currentIndex, 1);
+                        $scope.closeModal();
+                    }
+                })
+                .error(function() {})
+                .finally(function() {});
+        } else if ($scope.tags[$scope.currentIndex].id != null) {
+            // Modify.
+            $scope.editBlock = true;
+            $http.get("/api/tags/update", {
+                    params: {
+                        id: $scope.tags[$scope.currentIndex].id,
+                        name: $scope.tagName
+                    }
+                })
+                .success(function(data) {
+                    $scope.editStatus = data.status.message;
+                    if (data.status.success) {
+                        $scope.tags[$scope.currentIndex] = data.tag;
+                        $scope.closeModal();
+                    }
+                })
+                .error(function() {})
+                .finally(function() {
+                    $scope.editBlock = false;
+                    setTimeout(function() {
+                        $(".modal input").focus();
+                    });
+                });
+        } else {
+            // New.
+            $scope.editBlock = true;
+            $http.get("/api/tags/new", {
+                    params: {
+                        name: $scope.tagName
+                    }
+                })
+                .success(function(data) {
+                    $scope.editStatus = data.status.message;
+                    if (data.status.success) {
+                        $scope.tags[$scope.currentIndex] = data.tag;
+                        $scope.closeModal();
+                    }
+                })
+                .error(function() {})
+                .finally(function() {
+                    $scope.editBlock = false;
+                    setTimeout(function() {
+                        $(".modal input").focus();
+                    });
+                });
+        }
     };
     $scope.cancelTag = function() {
-        if ($scope.currentTag.name == null) {
+        if ($scope.tags[$scope.currentIndex].id == null) {
             $scope.tags.pop();
         }
-        jq(".ui.modal.tags")
-            .modal("hide");
-        $scope.editStatus = "";
+        $scope.closeModal();
     };
 });

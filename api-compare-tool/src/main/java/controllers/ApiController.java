@@ -1,6 +1,5 @@
 package controllers;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,9 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import comparator.DefaultJsonComparator;
 import responses.ErrorsResponse;
 import responses.TagResponse;
 import responses.TasksResponse;
@@ -61,83 +57,133 @@ public class ApiController {
 	}
 
 	/**
-	 * Modify a old tag to new tag.
+	 * Add a new tag
 	 * 
-	 * @param request
-	 * @param id
-	 *            Null for create a new tag.
-	 * @param tag
-	 *            Null for delete the exist tag.
-	 * @return Operation status and updated tag.
+	 * @return Status and id, set id in the message.
 	 */
-	@RequestMapping("/api/tags/modify")
-	public TagResponse modifyTag(HttpServletRequest request,
-			@RequestParam(value = "id", required = false) Integer id,
-			@RequestParam(value = "name", required = false) String name) {
+	@RequestMapping("/api/tags/new")
+	public TagResponse newTag(HttpServletRequest request,
+			@RequestParam(value = "name") String name) {
 		String user = Utils.getUserName(request);
-		// Check permission.
-		if (id != null) {
-			String creator = TAG.getTagCreator(id);
-			if ((user == null) || (!creator.equals(user))) {
-				return new TagResponse(new Status(false,
-						"Not creator, operation not allowed."), null);
-			}
+		if (name.equals("")) {
+			return new TagResponse(new Status(false,
+					"Name can't be empty string."), null);
 		}
-		Tag tag = null;
-		if (name != null) {
-			// Check new tag.
-			if (name.equals("")) {
-				return new TagResponse(new Status(false,
-						"Tag name can't be empty string."), null);
-			}
-			if (TAG.existName(name)) {
-				return new TagResponse(new Status(false,
-						"Tag name already exist."), null);
-			}
-			if (id == null) {
-				tag = TAG.addTag(name, user);
-			} else {
-				tag = TAG.updateTag(id, name);
-			}
-		} else {
-			TAG.deleteTag(id);
+		Integer id = TAG.addTag(name, user);
+		if (id == null) {
+			return new TagResponse(
+					new Status(false, "Tag name already exist."), null);
 		}
-		return new TagResponse(new Status(true, "Success."), tag);
+		Tag tag = TAG.getTagById(id);
+		return new TagResponse(new Status(true), tag);
+	}
+
+	/**
+	 * Update a tag.
+	 * 
+	 * @return Status.
+	 */
+	@RequestMapping("/api/tags/update")
+	public TagResponse modifyTag(HttpServletRequest request,
+			@RequestParam(value = "id") Integer id,
+			@RequestParam(value = "name") String name) {
+		String user = Utils.getUserName(request);
+		Tag tag = TAG.getTagById(id);
+		if (tag == null) {
+			return new TagResponse(new Status(false, 3), null);
+		}
+		if (!tag.getCreator().equals(user)) {
+			return new TagResponse(new Status(false, 2), null);
+		}
+		if (name.equals("")) {
+			return new TagResponse(new Status(false,
+					"Name can't be empty string."), null);
+		}
+		if (!TAG.updateTag(id, name)) {
+			return new TagResponse(
+					new Status(false, "Tag name already exist."), null);
+		}
+		tag = TAG.getTagById(id);
+		return new TagResponse(new Status(true), tag);
+	}
+
+	/**
+	 * Delete a tag.
+	 * 
+	 * @return Status.
+	 */
+	@RequestMapping("/api/tags/delete")
+	public Status deleteTag(HttpServletRequest request,
+			@RequestParam(value = "id") Integer id) {
+		String user = Utils.getUserName(request);
+		Tag tag = TAG.getTagById(id);
+		if (tag == null) {
+			return new Status(false, 3);
+		}
+		if (!tag.getCreator().equals(user)) {
+			return new Status(false, 2);
+		}
+		TAG.deleteTag(id);
+		return new Status(true);
 	}
 
 	/**
 	 * Create a new task
 	 * 
-	 * @return The created task.
-	 * @throws JsonProcessingException
-	 * @throws IOException
+	 * @return The created task's id.
 	 */
 	@RequestMapping(value = "/api/tasks/new", method = RequestMethod.POST)
-	public TasksResponse newTask(HttpServletRequest request,
-			@RequestBody Task task) throws JsonProcessingException, IOException {
+	public Status newTask(HttpServletRequest request, @RequestBody Task task) {
 		String user = Utils.getUserName(request);
-		int id = TASK.newTask(user, task);
+		task.setCreator(user);
+		int id = TASK.newTask(task);
 		task.setId(id);
-		if (task.getType() == 0) {
+		if (task.getType() == Task.Type.TEXT) {
 			TASK.executeTextTask(task);
 		}
-		return new TasksResponse(new Status(true), TASK.searchTasks(null, null,
-				null, id).get(0));
+		return new Status(true, id + "");
 	}
 
+	/**
+	 * Update a task.
+	 * 
+	 * @return Status.
+	 */
+	@RequestMapping(value = "/api/tasks/update", method = RequestMethod.POST)
+	public Status updateTask(HttpServletRequest request, @RequestBody Task task) {
+		String user = Utils.getUserName(request);
+		Task t = TASK.getTask(task.getId());
+		if (t == null) {
+			return new Status(false, 3);
+		}
+		if (!user.equals(t.getCreator())) {
+			return new Status(false, 2);
+		}
+		TASK.updateTask(task);
+		return new Status(true);
+	}
+
+	/**
+	 * Restart a task.
+	 * 
+	 * @return Status.
+	 */
 	@RequestMapping("/api/tasks/restart")
 	public Status restartTask(HttpServletRequest request,
 			@RequestParam(value = "id") Integer id) {
 		String user = Utils.getUserName(request);
 		Task task = TASK.getTask(id);
-		if (!user.equals(task.getCreator())) {
-			return new Status(false, "Not creator.");
+		if (task == null) {
+			return new Status(false, 3);
 		}
-		if (task.getStatus() != 2) {
+		if (!user.equals(task.getCreator())) {
+			return new Status(false, 2);
+		}
+		if (task.getStatus() != Task.Status.FINISHED) {
 			return new Status(false, "Task hasn't finished.");
 		}
 		ERROR.deleteErrorOfTask(task.getId());
-		if (task.getType() == 0) {
+		if (task.getType() == Task.Type.TEXT) {
 			TASK.executeTextTask(task);
 		} else {
 			TASK.restartTask(id);
@@ -164,6 +210,11 @@ public class ApiController {
 		return new TasksResponse(new Status(true), tasks);
 	}
 
+	/**
+	 * Get the specified task.
+	 * 
+	 * @return Task.
+	 */
 	@RequestMapping("/api/tasks/{id}")
 	public TasksResponse getTask(@PathVariable(value = "id") Integer id) {
 		Task task = TASK.getTask(id);
@@ -171,6 +222,11 @@ public class ApiController {
 		return new TasksResponse(status, task);
 	}
 
+	/**
+	 * Get specified errors.
+	 * 
+	 * @return Error.
+	 */
 	@RequestMapping("/api/errors/{id}")
 	public ErrorsResponse getError(@PathVariable(value = "id") Integer id) {
 		Error error = ERROR.getError(id);
