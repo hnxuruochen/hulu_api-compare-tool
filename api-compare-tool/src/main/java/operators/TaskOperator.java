@@ -71,7 +71,7 @@ public enum TaskOperator {
 	}
 
 	public int newTask(Task task) {
-		String q = "INSERT INTO tasks(creator, tag_id, time, type, param1, param2, requests, errors_limit) VALUES (?, ?, CURRENT_TIMESTAMP(), ?, ?, ?, ?, ?);";
+		String q = "INSERT INTO tasks(creator, tag_id, time, type, param1, param2, requests, errors_limit, status) VALUES (?, ?, CURRENT_TIMESTAMP(), ?, ?, ?, ?, ?);";
 		// Get auto generated primary key.
 		KeyHolder id = new GeneratedKeyHolder();
 		template.update(new PreparedStatementCreator() {
@@ -87,6 +87,7 @@ public enum TaskOperator {
 				ps.setString(5, task.getParam2());
 				ps.setString(6, task.getRequests());
 				ps.setInt(7, task.getErrorsLimit());
+				ps.setInt(7, Task.Status.WATING);
 				return ps;
 			}
 		}, id);

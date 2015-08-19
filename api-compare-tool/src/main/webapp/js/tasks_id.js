@@ -4,7 +4,7 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
     $scope.initializeTask = function() {
         if ($scope.task.type) {
             $scope.task.address1 = $scope.task.param1;
-            $scope.task.address1 = $scope.task.param2;
+            $scope.task.address2 = $scope.task.param2;
         } else {
             $scope.task.text1 = $scope.task.param1;
             $scope.task.text2 = $scope.task.param2;
