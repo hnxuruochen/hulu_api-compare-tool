@@ -13,6 +13,7 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
             $scope.task.address1 = $scope.task.param1;
             $scope.task.address2 = $scope.task.param2;
             $scope.textInfo.addClass("hide");
+            $scope.typeSelector.checkbox("set checked");
         } else {
             $scope.task.text1 = $scope.task.param1;
             $scope.task.text2 = $scope.task.param2;
@@ -87,6 +88,12 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
         $scope.task.tagId = $(".ui.dropdown.tags")
             .dropdown("get value");
         if ($scope.task.type == 1) {
+            if ($scope.task.address1.endsWith("/")) {
+                $scope.task.address1 = $scope.task.address1.substring(0, $scope.task.address1.length - 1);
+            }
+            if ($scope.task.address2.endsWith("/")) {
+                $scope.task.address2 = $scope.task.address2.substring(0, $scope.task.address2.length - 1);
+            }
             $scope.task.param1 = $scope.task.address1;
             $scope.task.param2 = $scope.task.address2;
         } else {

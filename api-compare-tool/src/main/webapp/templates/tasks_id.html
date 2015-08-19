@@ -95,7 +95,7 @@
             </div>
         </div>
         <div class="field" align="right" style="width: 30%;">
-            <button class="ui button green" ng-click="editTask()" ng-hide="editingTask" ng-disabled="savingTask || loadingTags">
+            <button class="ui button green" ng-click="editTask()" ng-hide="editingTask || userData.userAccount != task.creator" ng-disabled="savingTask || loadingTags">
                 Edit
             </button>
             <button class="ui button green" ng-click="saveTask()" ng-show="editingTask" ng-disabled="savingTask || loadingTags">

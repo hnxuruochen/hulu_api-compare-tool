@@ -37,6 +37,9 @@ public class TaskExecutor implements Runnable {
 	 * Compare one uri of two apis.
 	 */
 	private boolean compare(Task task, String uri) {
+		if (!uri.startsWith("/")) {
+			uri = uri + "/";
+		}
 		URL ua = null;
 		try {
 			ua = new URL(task.getParam1() + uri);
