@@ -5,9 +5,13 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
         if ($scope.task.type) {
             $scope.task.address1 = $scope.task.param1;
             $scope.task.address2 = $scope.task.param2;
+            $(".ui.checkbox.toggle")
+                .checkbox("check");
         } else {
             $scope.task.text1 = $scope.task.param1;
             $scope.task.text2 = $scope.task.param2;
+            $(".ui.checkbox.toggle")
+                .checkbox("uncheck");
         }
         $(".ui.dropdown.errors-limit")
             .dropdown("set selected", $scope.task.errorsLimit);
