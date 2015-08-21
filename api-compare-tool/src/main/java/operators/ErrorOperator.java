@@ -2,7 +2,7 @@ package operators;
 
 import java.util.List;
 
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import entities.Error;
@@ -27,16 +27,16 @@ public enum ErrorOperator {
 		Error error = null;
 		try {
 			error = template.queryForObject(q, new Error.ErrorMapper(true), id);
-		} catch (DataAccessException e) {
+		} catch (EmptyResultDataAccessException e) {
 		}
 		return error;
 	}
-	
+
 	public void newError(int taskId, String message, String input, String output) {
 		String q = "INSERT INTO errors(task_id, time, message, input, output) VALUES (?, CURRENT_TIMESTAMP(), ?, ?, ?);";
-		template.update(q, taskId, message, input, output);				
+		template.update(q, taskId, message, input, output);
 	}
-	
+
 	public void deleteErrorOfTask(int taskId) {
 		String q = "DELETE FROM errors WHERE task_id = ?;";
 		template.update(q, taskId);

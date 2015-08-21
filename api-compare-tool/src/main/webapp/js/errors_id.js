@@ -1,38 +1,42 @@
 "use strict";
-mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $compile) {
+mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $compile, $location) {
     $scope.loadingData = true;
     // Load error data.
     $http.get("/api/errors/" + $routeParams.id)
         .success(function(data) {
-            $scope.error = data.error;
-            $scope.loadingData = false;
-            $scope.renderErrorView();
+            if (!data.status.success) {
+                $location.path("/404");
+            } else {
+                $scope.error = data.error;
+                $scope.loadingData = false;
+                $scope.renderErrorView();
+            }
         });
     // Expand or collapse a block.
     $scope.toggleExpand = function(line) {
-        $scope.lineStyle[line].expand = !$scope.lineStyle[line].expand;
-    }
-    // Check whether a line is a block start.
+            $scope.lineStyle[line].expand = !$scope.lineStyle[line].expand;
+        }
+        // Check whether a line is a block start.
     $scope.isContentStart = function(line) {
-        var c = line.charAt(line.length - 1);
-        if ((c == '[') || (c == '{')) {
-            return true;
+            var c = line.charAt(line.length - 1);
+            if ((c == '[') || (c == '{')) {
+                return true;
+            }
+            return false;
         }
-        return false;
-    }
-    // Check whether a line is a block end.
+        // Check whether a line is a block end.
     $scope.isContentEnd = function(line) {
-        var c = line.charAt(line.length - 1);
-        // Skip ',' seperator.
-        if (c == ",") {
-            c = line.charAt(line.length - 2);
+            var c = line.charAt(line.length - 1);
+            // Skip ',' seperator.
+            if (c == ",") {
+                c = line.charAt(line.length - 2);
+            }
+            if ((c == ']') || (c == '}')) {
+                return true;
+            }
+            return false;
         }
-        if ((c == ']') || (c == '}')) {
-            return true;
-        }
-        return false;
-    }
-    // Specify a color for each mark.
+        // Specify a color for each mark.
     $scope.getColor = function(c) {
         if (c == '*') {
             return " mixed";
@@ -47,7 +51,7 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
         if ($scope.error.output == null) {
             return;
         }
-    	// Initialize.
+        // Initialize.
         var errorHtml = "";
         $scope.error.output = $scope.error.output.split("\n");
         var lines = $scope.error.output;

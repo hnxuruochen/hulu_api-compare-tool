@@ -5,4 +5,10 @@ public class Config {
 	public static final String DB_ADDRESS = "jdbc:mysql://10.128.10.174:3306/api_compare_tool";
 	public static final String DB_USER = "search";
 	public static final String DB_PASSWD = "search";
+	
+	public static final String HDFS_PATH = "http://10.16.60.114:50070/webhdfs/v1/user/search/:id.txt?op=OPEN&user.name=search";
+	public static final int TASK_EXECUTOR_NUM = 2;
+	
+	public static final String USER_DATA = "user_data";
+	public static final String USER_NAME = "user_name";
 }

@@ -20,7 +20,7 @@
                 <div class="ui large label" style="margin-right: 10px;">
                     Status:
                 </div>
-                <div class="ui large label" ng-show="task.status" ng-class="{green: task.status == 3 && task.errorsCount == 0, red: task.status == 3 && task.errorsCount > 0, yellow: task.status == 2, grey: task.status == 1}">
+                <div class="ui large label" ng-class="{green: task.status == 3 && task.errorsCount == 0, red: task.status == 3 && task.errorsCount > 0, yellow: task.status == 2, grey: task.status == 0, teal: task.status == 1}">
                     {{status[task.status]}}
                 </div>
             </div>
@@ -37,8 +37,11 @@
             </div>
             {{task.time}}
         </div>
-        <div class="field" align="right" style="width: 10%;">
-            <button class="ui button red" ng-click="restartTask()" ng-show="userData.userAccount == task.creator" ng-disabled="task.status != 3 || savingTask || editingTask">
+        <div class="field" align="right" style="width: 20%;">
+            <button class="ui button blue" ng-click="loadTask()" ng-disabled="savingTask || editingTask">
+                Refresh
+            </button>
+            <button class="ui button red" ng-click="restartTask()" ng-show="userData.userAccount == task.creator" ng-disabled="task.status == 2 || task.status == 1 || savingTask || editingTask">
                 Restart
             </button>
         </div>
@@ -88,7 +91,7 @@
                 <div style="line-height: 36px;">
                     <label style="margin-left:10px; margin-right: 10px;">Text</label>
                     <div id="type-selector" class="ui toggle checkbox">
-                        <input type="checkbox" name="type" ng-disabled="savingTask || !editingTask">
+                        <input type="checkbox" name="type" ng-model="task.type" ng-true-value="1" ng-false-value="0" ng-disabled="task.id">
                         <label>Service</label>
                     </div>
                 </div>
@@ -107,7 +110,7 @@
         </div>
     </div>
     <!-- Service info -->
-    <div class="field" id="service-info">
+    <div class="field" ng-show="task.type">
         <div class="two fields">
             <div class="field">
                 <div class="ui labeled input">
@@ -130,11 +133,20 @@
             <div class="ui large label">
                 Requests:
             </div>
-            <textarea ng-model="task.requests" ng-disabled="savingTask || !editingTask"></textarea>
+            <div class="ui checkbox">
+                <input type="checkbox" checked="" ng-model="task.useFile">
+                <label>Use File</label>
+            </div>
+            <button class="ui button green small" style="margin-left: 100px;" ng-click="getUploadScript()">
+                Get upload script
+            </button>
+            {{scriptUsage}}
+            <input type="text" placeHolder="Task ID, empty for current task" ng-model="task.fileId" ng-disabled="savingTask || !editingTask || !task.useFile">
+            <textarea ng-model="task.requests" placeHolder="Requests" ng-disabled="savingTask || !editingTask || task.useFile"></textarea>
         </div>
     </div>
     <!-- Text info -->
-    <div class="field" id="text-info">
+    <div class="field" ng-hide="task.type">
         <div class="two fields">
             <div class="field">
                 <div class="ui large label">

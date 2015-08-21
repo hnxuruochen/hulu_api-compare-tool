@@ -1,31 +1,24 @@
 "use strict";
 mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $location) {
     // Initialize task view with task object.
-    $scope.typeSelector = $("#type-selector");
-    $scope.serviceInfo = $("#service-info");
-    $scope.textInfo = $("#text-info");
-    $scope.toggleTypeView = function() {
-        $scope.serviceInfo.toggleClass("hide");
-        $scope.textInfo.toggleClass("hide");
-    };
+    $scope.errorsLimitDropdown = $(".ui.dropdown.errors-limit");
+    $scope.tagsDropdown = $(".ui.dropdown.tags.tasks-id");
     $scope.initializeTask = function() {
         if ($scope.task.type == 1) {
             $scope.task.address1 = $scope.task.param1;
             $scope.task.address2 = $scope.task.param2;
-            $scope.textInfo.addClass("hide");
-            $scope.typeSelector.checkbox("set checked");
+            $("#type-selector").checkbox("set checked");
         } else {
             $scope.task.text1 = $scope.task.param1;
             $scope.task.text2 = $scope.task.param2;
-            $scope.serviceInfo.addClass("hide");
         }
-        $(".ui.dropdown.errors-limit")
+        $scope.errorsLimitDropdown
             .dropdown("set selected", $scope.task.errorsLimit);
         // When tags haven't been loaded.
         $scope.setRootTagConfig(".ui.dropdown.tags.tasks-id", $scope.task.tagId);
         // When tags already have been loaded.
         setTimeout(function() {
-            $(".ui.dropdown.tags")
+            $scope.tagsDropdown
                 .dropdown("set selected", $scope.task.tagId);
         });
     };
@@ -35,9 +28,13 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
         $scope.loadingData = true;
         $http.get("/api/tasks/" + $routeParams.id)
             .success(function(data) {
-                $scope.task = data.task;
-                $scope.loadingData = false;
-                $scope.initializeTask();
+                if (!data.status.success) {
+                    $location.path("/404");
+                } else {
+                    $scope.task = data.task;
+                    $scope.loadingData = false;
+                    $scope.initializeTask();
+                }
             });
     };
     // Create a new task object.
@@ -48,6 +45,7 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
         $scope.task.param2 = "";
         $scope.task.requests = "";
         $scope.task.type = 0;
+        $scope.task.useFile = false;
         $scope.task.errorsLimit = 1;
         $scope.initializeTask();
     };
@@ -83,9 +81,9 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
     $scope.savingTask = false;
     $scope.saveTask = function() {
         // Map view value to task object.
-        $scope.task.errorsLimit = $(".ui.dropdown.errors-limit")
+        $scope.task.errorsLimit = $scope.errorsLimitDropdown
             .dropdown("get value");
-        $scope.task.tagId = $(".ui.dropdown.tags")
+        $scope.task.tagId = $scope.tagsDropdown
             .dropdown("get value");
         if ($scope.task.type == 1) {
             if ($scope.task.address1.endsWith("/")) {
@@ -106,6 +104,8 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
             type: $scope.task.type,
             param1: $scope.task.param1,
             param2: $scope.task.param2,
+            useFile: $scope.task.useFile,
+            fileId: $scope.task.fileId == "" ? null : $scope.task.fileId,
             requests: $scope.task.requests
         };
         $scope.savingTask = true;
@@ -113,7 +113,9 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
         if ($scope.task.id == undefined) {
             $http.post("/api/tasks/new", params)
                 .success(function(data) {
-                    $location.path("/tasks/" + data.message);
+                    if (data.success) {
+                        $location.path("/tasks/" + data.message);
+                    }
                 })
                 .error(function() {})
                 .finally(function() {
@@ -124,7 +126,10 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
             params.id = $scope.task.id;
             $http.post("/api/tasks/update", params)
                 .success(function(data) {
-                    $scope.editingTask = false;
+                    if (data.success) {
+                        $scope.editingTask = false;
+                        $scope.loadTask();
+                    }
                 })
                 .error(function() {})
                 .finally(function() {
@@ -132,12 +137,8 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
                 });
         }
     };
-
-    $scope.typeSelector
-        .checkbox({
-            onChange: function() {
-                $scope.task.type = 1 - $scope.task.type;
-                $scope.toggleTypeView();
-            }
-        });
+    $scope.scriptUsage = "Usage: upload.sh <task id> <file path>";
+    $scope.getUploadScript = function() {
+        window.location.href = "/upload.sh";
+    };
 });

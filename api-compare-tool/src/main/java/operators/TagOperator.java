@@ -53,7 +53,7 @@ public enum TagOperator {
 		String q = "SELECT * FROM tags WHERE id = ?";
 		Tag tag = null;
 		try {
-		tag = template.queryForObject(q, new Tag.TagMapper(), id);
+			tag = template.queryForObject(q, new Tag.TagMapper(), id);
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
@@ -71,7 +71,9 @@ public enum TagOperator {
 	}
 
 	public void deleteTag(Integer id) {
-		String q = "DELETE FROM tags WHERE id = ?";
+		String q = "DELETE FROM tags WHERE id = ?;";
+		template.update(q, id);
+		q = "UPDATE tasks SET tag_id = 1 WHERE tag_id = ?;";
 		template.update(q, id);
 	}
 }

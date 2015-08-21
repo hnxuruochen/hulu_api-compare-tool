@@ -21,7 +21,7 @@ public enum TaskOperator {
 	INSTANCE;
 	private static final String BASIC_TASK = "id, creator, tag_id, time, type, errors_limit, errors_count, status";
 	private static final String FULL_TASK = BASIC_TASK
-			+ ", param1, param2, requests";
+			+ ", param1, param2, use_file, file_id, requests";
 	private JdbcTemplate template = null;
 
 	TaskOperator() {
@@ -31,8 +31,7 @@ public enum TaskOperator {
 	/**
 	 * Null for no limit.
 	 */
-	public List<Task> searchTasks(String creator, String tags, String status,
-			Integer id) {
+	public List<Task> searchTasks(String creator, String tags, String status) {
 		List<String> where = new ArrayList<String>();
 		List<String> param = new ArrayList<String>();
 		if (creator != null) {
@@ -45,11 +44,6 @@ public enum TaskOperator {
 		if (status != null) {
 			where.add("status in " + status);
 		}
-		if (id != null) {
-			where.add("id = ?");
-			param.add(id.toString());
-		}
-
 		String q = "SELECT " + BASIC_TASK + " FROM tasks";
 		if (where.size() > 0) {
 			q = q + " WHERE " + StringUtils.join(where, " AND ");
@@ -71,7 +65,7 @@ public enum TaskOperator {
 	}
 
 	public int newTask(Task task) {
-		String q = "INSERT INTO tasks(creator, tag_id, time, type, param1, param2, requests, errors_limit, status) VALUES (?, ?, CURRENT_TIMESTAMP(), ?, ?, ?, ?, ?, ?);";
+		String q = "INSERT INTO tasks(creator, tag_id, time, type, param1, param2, use_file, file_id, requests, errors_limit, status) VALUES (?, ?, CURRENT_TIMESTAMP(), ?, ?, ?, ?, ?, ?, ?, ?);";
 		// Get auto generated primary key.
 		KeyHolder id = new GeneratedKeyHolder();
 		template.update(new PreparedStatementCreator() {
@@ -85,9 +79,11 @@ public enum TaskOperator {
 				ps.setInt(3, task.getType());
 				ps.setString(4, task.getParam1());
 				ps.setString(5, task.getParam2());
-				ps.setString(6, task.getRequests());
-				ps.setInt(7, task.getErrorsLimit());
-				ps.setInt(8, Task.Status.WATING);
+				ps.setBoolean(6, task.getUseFile());
+				ps.setString(7, task.getFileId());
+				ps.setString(8, task.getRequests());
+				ps.setInt(9, task.getErrorsLimit());
+				ps.setInt(10, Task.Status.WATING);
 				return ps;
 			}
 		}, id);
@@ -95,10 +91,10 @@ public enum TaskOperator {
 	}
 
 	public void updateTask(Task task) {
-		String q = "UPDATE tasks SET tag_id = ?, time = CURRENT_TIMESTAMP(), type = ?, param1 = ?, param2 = ?, requests = ?, errors_limit = ? WHERE id = ?;";
+		String q = "UPDATE tasks SET tag_id = ?, time = CURRENT_TIMESTAMP(), type = ?, param1 = ?, param2 = ?, use_file = ?, file_id = ?, requests = ?, errors_limit = ? WHERE id = ?;";
 		template.update(q, task.getTagId(), task.getType(), task.getParam1(),
-				task.getParam2(), task.getRequests(), task.getErrorsLimit(),
-				task.getId());
+				task.getParam2(), task.getUseFile(), task.getFileId(),
+				task.getRequests(), task.getErrorsLimit(), task.getId());
 	}
 
 	public void updateTask(int id, int errorsCount, int status) {
@@ -106,10 +102,13 @@ public enum TaskOperator {
 		template.update(q, errorsCount, status, id);
 	}
 
-	public void restartTask(int id) {
-		String q = "UPDATE tasks SET status = " + Task.Status.WATING
-				+ " WHERE id = ?";
-		template.update(q, id);
+	public String getCreator(int id) {
+		String q = "SELECT creator FROM tasks WHERE id = ?;";
+		try {
+			return template.queryForObject(q, String.class, id);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	public void executeTextTask(Task task) {

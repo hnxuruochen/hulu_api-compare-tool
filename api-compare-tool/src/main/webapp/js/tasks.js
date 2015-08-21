@@ -1,6 +1,8 @@
 "use strict";
 mainApp.controller("TasksController", function($scope, $rootScope, $http, $location) {
     // Initialize.
+    $scope.searchTags = $(".ui.dropdown.tags.multiple");
+    $scope.searchStatus = $(".ui.dropdown.status.multiple");
     $scope.initializeSearchData = function() {
         $scope.searchData = {}
         $scope.searchData.preparingData = false;
@@ -11,9 +13,9 @@ mainApp.controller("TasksController", function($scope, $rootScope, $http, $locat
     };
     $scope.initializeSearchData();
     $scope.search = function() {
-        $scope.searchData.tags = "[" + $(".ui.dropdown.tags.multiple")
+        $scope.searchData.tags = "[" + $scope.searchTags
             .dropdown("get value") + "]";
-        $scope.searchData.status = "[" + $(".ui.dropdown.status.multiple")
+        $scope.searchData.status = "[" + $scope.searchStatus
             .dropdown("get value") + "]";
         $scope.searchData.preparingData = true;
         $http.get("/api/tasks/search", {

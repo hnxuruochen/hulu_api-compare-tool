@@ -6,6 +6,7 @@ mainApp.controller("TagsController", function($scope, $http) {
     $scope.currentIndex = null;
     $scope.editBlock = false;
     $scope.removingTag = false;
+    $scope.input = $(".modal input");
     // Open tag editor.
     $scope.openModal = function() {
         $(".ui.modal.tags")
@@ -13,14 +14,14 @@ mainApp.controller("TagsController", function($scope, $http) {
                 closable: false,
                 onVisible: function() {
                     setTimeout(function() {
-                        $(".modal input").focus();
-                    }, 1);
+                        $scope.input.focus();
+                    }, 0);
                 }
             })
             .modal("show");
     };
     $scope.closeModal = function() {
-        $(".ui.modal")
+        $(".ui.modal.tags")
             .modal("hide");
         $scope.editStatus = "";
     };
@@ -47,6 +48,7 @@ mainApp.controller("TagsController", function($scope, $http) {
     }
     $scope.saveTag = function() {
         $scope.editStatus = "Waiting please.";
+        $scope.editBlock = true;
         if ($scope.removingTag) {
             // Delete.
             $http.get("/api/tags/delete", {
@@ -62,10 +64,11 @@ mainApp.controller("TagsController", function($scope, $http) {
                     }
                 })
                 .error(function() {})
-                .finally(function() {});
+                .finally(function() {
+                    $scope.editBlock = false;
+                });
         } else if ($scope.tags[$scope.currentIndex].id != null) {
             // Modify.
-            $scope.editBlock = true;
             $http.get("/api/tags/update", {
                     params: {
                         id: $scope.tags[$scope.currentIndex].id,
@@ -83,12 +86,11 @@ mainApp.controller("TagsController", function($scope, $http) {
                 .finally(function() {
                     $scope.editBlock = false;
                     setTimeout(function() {
-                        $(".modal input").focus();
+                        $scope.input.focus();
                     });
                 });
         } else {
             // New.
-            $scope.editBlock = true;
             $http.get("/api/tags/new", {
                     params: {
                         name: $scope.tagName
@@ -105,7 +107,7 @@ mainApp.controller("TagsController", function($scope, $http) {
                 .finally(function() {
                     $scope.editBlock = false;
                     setTimeout(function() {
-                        $(".modal input").focus();
+                        $scope.input.focus();
                     });
                 });
         }

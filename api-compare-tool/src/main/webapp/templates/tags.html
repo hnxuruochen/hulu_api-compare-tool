@@ -5,7 +5,7 @@
             Do you want to remove this tag?
         </div>
         <div class="ui input focus">
-            <input type="text" ng-model="tagName" ng-disabled="editBlock || removingTag">
+            <input type="text" maxlength="32" ng-model="tagName" ng-disabled="editBlock || removingTag">
         </div>
         <div style="margin-top: 10px;">
             {{editStatus}}

@@ -3,7 +3,7 @@ var mainApp = angular.module("mainApp", ["ngRoute"]);
 mainApp.controller("layoutController", function($scope, $rootScope, $http) {
     // Initialize.
     $rootScope.types = ["Text", "Service"];
-    $rootScope.status = ["Preparing", "Waiting", "Running", "Finished"];
+    $rootScope.status = ["No data", "Waiting", "Running", "Finished"];
     $rootScope.searchResult = [];
     // Load user info first.
     $.ajax({
@@ -26,7 +26,7 @@ mainApp.controller("layoutController", function($scope, $rootScope, $http) {
     $rootScope.setRootTagConfig(null, 1);
     $http.get("/api/tags")
         .success(function(data) {
-            $rootScope.tags = data;
+            $rootScope.tags = data.tags;
             $rootScope.loadingTags = false;
             // Set default tag for current page.
             setTimeout(function() {

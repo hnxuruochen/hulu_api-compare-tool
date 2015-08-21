@@ -13,6 +13,7 @@ public class Task {
 		public static final int RUNNING = 2;
 		public static final int FINISHED = 3;
 	}
+
 	public class Type {
 		public static final int TEXT = 0;
 		public static final int SERVICE = 1;
@@ -36,6 +37,8 @@ public class Task {
 				task.setParam1(rs.getString("param1"));
 				task.setParam2(rs.getString("param2"));
 				task.setRequests(rs.getString("requests"));
+				task.setUseFile(rs.getBoolean("use_file"));
+				task.setFileId(rs.getString("file_id"));
 			}
 			task.setType(rs.getInt("type"));
 			task.setErrorsLimit(rs.getInt("errors_limit"));
@@ -47,15 +50,17 @@ public class Task {
 
 	private Integer id = null;
 	private String creator = null;
-	private Integer tagId = 1;
+	private Integer tagId = null;
 	private String time = null;
-	private String param1 = "";
-	private String param2 = "";
-	private String requests = "";
-	private Integer type = 0;
-	private Integer errorsLimit = 1;
-	private Integer errorsCount = 0;
-	private Integer status = Status.WATING;
+	private String param1 = null;
+	private String param2 = null;
+	private Boolean useFile = null;
+	private String fileId = null;
+	private String requests = null;
+	private Integer type = null;
+	private Integer errorsLimit = null;
+	private Integer errorsCount = null;
+	private Integer status = null;
 	private List<Error> errors = null;
 
 	public void setId(Integer id) {
@@ -80,6 +85,14 @@ public class Task {
 
 	public void setParam2(String address2) {
 		this.param2 = address2;
+	}
+
+	public void setUseFile(Boolean useFile) {
+		this.useFile = useFile;
+	}
+
+	public void setFileId(String fileId) {
+		this.fileId = fileId;
 	}
 
 	public void setRequests(String requests) {
@@ -128,6 +141,14 @@ public class Task {
 
 	public String getParam2() {
 		return param2;
+	}
+
+	public Boolean getUseFile() {
+		return useFile;
+	}
+
+	public String getFileId() {
+		return fileId;
 	}
 
 	public String getRequests() {
