@@ -134,7 +134,7 @@
                 Requests:
             </div>
             <div class="ui checkbox">
-                <input type="checkbox" checked="" ng-model="task.useFile">
+                <input type="checkbox" checked="" ng-model="task.useFile" ng-disabled="savingTask || !editingTask">
                 <label>Use File</label>
             </div>
             <button class="ui button green small" style="margin-left: 100px;" ng-click="getUploadScript()">

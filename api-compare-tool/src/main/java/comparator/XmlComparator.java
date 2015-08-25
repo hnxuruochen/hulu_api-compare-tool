@@ -1,7 +1,6 @@
 package comparator;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,9 +59,6 @@ public class XmlComparator {
 			now.append(" ").append(a.getName()).append("=\"")
 					.append(a.getValue()).append("\"");
 		}
-		if (!node.hasContent()) {
-			now.append("/");
-		}
 		now.append(">");
 		return now.toString();
 	}
@@ -98,6 +94,8 @@ public class XmlComparator {
 				now.append(prefix).append(spaces(deep));
 			}
 			now.append("</").append(node.getName()).append(">");
+		} else {
+			now.insert(now.length() - 1, '/');
 		}
 		now.append("\n");
 		return now;
@@ -108,10 +106,18 @@ public class XmlComparator {
 	 * 
 	 * @param node
 	 * @return
+	 * @throws DocumentException 
 	 */
-	private static boolean isArray(Element node) {
+	private static boolean isArray(Element node) throws DocumentException {
 		Attribute type = node.attribute("type");
-		return (type != null) && (type.getValue().equals("array"));
+		if ((type == null) || (!type.getValue().equals("array"))) {
+			return false;
+		}
+		if ((node.hasContent()) && (node.isTextOnly())) {
+			// Can't handle text in array.
+			throw new DocumentException("Text in array: " + node.asXML());
+		}
+		return true;
 	}
 
 	/**
@@ -282,15 +288,5 @@ public class XmlComparator {
 		}
 		br.close();
 		return s.toString();
-	}
-
-	public static void main(String[] args) throws DocumentException,
-			IOException {
-		String text = "<a/>";
-		Document d = DocumentHelper.parseText(text);
-		Element e = d.getRootElement();
-		String a = readFile("a.txt");
-		String b = readFile("b.txt");
-		System.out.println(XmlComparator.compare(a, b));
 	}
 }
