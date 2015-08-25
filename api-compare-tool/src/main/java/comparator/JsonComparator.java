@@ -10,7 +10,16 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class DefaultJsonComparator {
+/**
+ * A json comparator, follow standard json rules, objects are disordered, arrays are
+ * ordered. Objects and arrays are all expanded as lines, same keys with
+ * different values will be displayed twice. Add a difference mark at beginning of
+ * each line.
+ * 
+ * @author ruochen.xu
+ *
+ */
+public class JsonComparator {
 	private static int TAB_LEN = 4;
 
 	/**
@@ -126,6 +135,7 @@ public class DefaultJsonComparator {
 		StringBuilder now = new StringBuilder();
 		if (a.equals(b)) {
 			// Normally print if equal.
+			// HashMap implement this method in O(1).
 			now = formatPrint(a, key, deep, " ");
 		} else if ((a.isObject()) && (b.isObject())) {
 			// If both object, compare them according the keys.
@@ -181,10 +191,6 @@ public class DefaultJsonComparator {
 	/**
 	 * Convert two string to json, compare them and print the difference.
 	 * 
-	 * @param a
-	 *            The first string.
-	 * @param b
-	 *            The second string.
 	 * @return Formated output.
 	 */
 	public static String compare(String a, String b) {
@@ -197,6 +203,12 @@ public class DefaultJsonComparator {
 			return null;
 		}
 	}
+
+	/**
+	 * Compare two json node.
+	 * 
+	 * @return Formated outout.
+	 */
 	public static String compare(JsonNode a, JsonNode b) {
 		return compareNode(a, b, "", 0).toString();
 	}

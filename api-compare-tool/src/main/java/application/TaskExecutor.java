@@ -13,7 +13,7 @@ import java.sql.Statement;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import comparator.DefaultJsonComparator;
+import comparator.JsonComparator;
 import configs.Config;
 import entities.Task;
 import entities.Task.TaskMapper;
@@ -79,7 +79,7 @@ public class TaskExecutor implements Runnable {
 			return false;
 		}
 		// Compare.
-		String output = DefaultJsonComparator.compare(a, b);
+		String output = JsonComparator.compare(a, b);
 		if (output.startsWith("*")) {
 			ERROR.newError(task.getId(), "Different json text.", uri, output);
 			return false;

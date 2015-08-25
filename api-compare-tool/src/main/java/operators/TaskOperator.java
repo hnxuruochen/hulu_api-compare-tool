@@ -14,7 +14,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-import comparator.DefaultJsonComparator;
+import comparator.JsonComparator;
 import entities.Task;
 
 public enum TaskOperator {
@@ -112,7 +112,7 @@ public enum TaskOperator {
 	}
 
 	public void executeTextTask(Task task) {
-		String output = DefaultJsonComparator.compare(task.getParam1(),
+		String output = JsonComparator.compare(task.getParam1(),
 				task.getParam2());
 		if ((output != null) && (!output.startsWith("*"))) {
 			updateTask(task.getId(), 0, Task.Status.FINISHED);
