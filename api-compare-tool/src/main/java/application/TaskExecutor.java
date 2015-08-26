@@ -10,10 +10,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.io.SAXReader;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import comparator.JsonComparator;
+import comparator.XmlComparator;
 import configs.Config;
 import entities.Task;
 import entities.Task.TaskMapper;
@@ -26,6 +31,7 @@ public class TaskExecutor implements Runnable {
 
 	Connection con = null;
 	ObjectMapper objectMapper = null;
+	SAXReader saxReader = null;
 	TaskMapper taskMapper = null;
 	ErrorOperator ERROR = ErrorOperator.INSTANCE;
 
@@ -38,6 +44,7 @@ public class TaskExecutor implements Runnable {
 		con.setAutoCommit(false);
 		taskMapper = new Task.TaskMapper(true);
 		objectMapper = new ObjectMapper();
+		saxReader = new SAXReader();
 	}
 
 	/**
@@ -53,35 +60,69 @@ public class TaskExecutor implements Runnable {
 		try {
 			ua = new URL(task.getParam1() + uri);
 		} catch (MalformedURLException e) {
-			ERROR.newError(task.getId(), "Address1 invalid.", uri, null);
+			ERROR.newError(task.getId(), "Address1 invalid.", task.getIsXml(),
+					uri, null);
 			return false;
 		}
 		URL ub = null;
 		try {
 			ub = new URL(task.getParam2() + uri);
 		} catch (MalformedURLException e) {
-			ERROR.newError(task.getId(), "Address2 invalid.", uri, null);
+			ERROR.newError(task.getId(), "Address2 invalid.", task.getIsXml(),
+					uri, null);
 			return false;
 		}
-		// Get jsons.
-		JsonNode a = null;
-		try {
-			a = objectMapper.readTree(ua);
-		} catch (IOException e) {
-			ERROR.newError(task.getId(), "Json1 invalid.", uri, null);
-			return false;
+		String output = null;
+		if (task.getIsXml()) {
+			// Get Xmls.
+			Document a = null;
+			try {
+				a = saxReader.read(ua);
+			} catch (DocumentException e) {
+				ERROR.newError(task.getId(), "Xml1 invalid.", task.getIsXml(),
+						uri, null);
+				return false;
+			}
+			Document b = null;
+			try {
+				b = saxReader.read(ub);
+			} catch (DocumentException e) {
+				ERROR.newError(task.getId(), "Xml2 invalid.", task.getIsXml(),
+						uri, null);
+				return false;
+			}
+			try {
+				output = XmlComparator.compare(a.getRootElement(),
+						b.getRootElement());
+			} catch (DocumentException e) {
+				ERROR.newError(task.getId(), "Xml invalid.", task.getIsXml(),
+						uri, null);
+				System.out.println(e.getMessage());
+				return false;
+			}
+		} else {
+			// Get jsons.
+			JsonNode a = null;
+			try {
+				a = objectMapper.readTree(ua);
+			} catch (IOException e) {
+				ERROR.newError(task.getId(), "Json1 invalid.", task.getIsXml(),
+						uri, null);
+				return false;
+			}
+			JsonNode b = null;
+			try {
+				b = objectMapper.readTree(ub);
+			} catch (IOException e) {
+				ERROR.newError(task.getId(), "Json2 invalid", task.getIsXml(),
+						uri, null);
+				return false;
+			}
+			output = JsonComparator.compare(a, b);
 		}
-		JsonNode b = null;
-		try {
-			b = objectMapper.readTree(ub);
-		} catch (IOException e) {
-			ERROR.newError(task.getId(), "Json2 invalid", uri, null);
-			return false;
-		}
-		// Compare.
-		String output = JsonComparator.compare(a, b);
 		if (output.startsWith("*")) {
-			ERROR.newError(task.getId(), "Different json text.", uri, output);
+			ERROR.newError(task.getId(), "Different text.", task.getIsXml(),
+					uri, output);
 			return false;
 		}
 		return true;

@@ -21,7 +21,8 @@ public class Error {
 			error.setTaskId(rs.getInt("task_id"));
 			error.setTime(rs.getDate("time") + "  " + rs.getTime("time"));
 			error.setMessage(rs.getString("message"));
-			error.setInput(rs.getString("input"));	
+			error.setIsXml(rs.getBoolean("is_xml"));
+			error.setInput(rs.getString("input"));
 			if (fullData) {
 				error.setOutput(rs.getString("output"));
 			}
@@ -33,6 +34,7 @@ public class Error {
 	private Integer taskId = null;
 	private String time = null;
 	private String message = null;
+	private Boolean isXml = null;
 	private String input = null;
 	private String output = null;
 
@@ -50,6 +52,10 @@ public class Error {
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public void setIsXml(Boolean isXml) {
+		this.isXml = isXml;
 	}
 
 	public void setInput(String input) {
@@ -74,6 +80,10 @@ public class Error {
 
 	public String getMessage() {
 		return message;
+	}
+
+	public Boolean getIsXml() {
+		return isXml;
 	}
 
 	public String getInput() {

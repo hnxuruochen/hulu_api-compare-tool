@@ -11,10 +11,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * A json comparator, follow standard json rules, objects are disordered, arrays are
- * ordered. Objects and arrays are all expanded as lines, same keys with
- * different values will be displayed twice. Add a difference mark at beginning of
- * each line.
+ * A json comparator, follow standard json rules, objects are disordered, arrays
+ * are ordered. Objects and arrays are all expanded as lines, same keys with
+ * different values will be displayed twice. Add a difference mark at beginning
+ * of each line.
  * 
  * @author ruochen.xu
  *
@@ -87,28 +87,28 @@ public class JsonComparator {
 		// Add object key.
 		now.append(prefix).append(spaces(deep)).append(key);
 		if (node.isObject()) {
-			now.append("{\n");
+			now.append("{");
 			subs = new ArrayList<StringBuilder>();
 			for (String name : getKeyList(node)) {
 				subs.add(formatPrint(node.get(name), name + ": ", deep + 1,
 						prefix));
 			}
-			now.append(StringUtils.join(subs, ",\n"));
 			if (!subs.isEmpty()) {
-				now.append("\n");
+				now.append("\n").append(StringUtils.join(subs, ",\n"))
+						.append("\n").append(prefix).append(spaces(deep));
 			}
-			now.append(prefix).append(spaces(deep)).append("}");
+			now.append("}");
 		} else if (node.isArray()) {
-			now.append("[\n");
+			now.append("[");
 			subs = new ArrayList<StringBuilder>();
 			for (JsonNode j : getNodeList(node)) {
 				subs.add(formatPrint(j, "", deep + 1, prefix));
 			}
-			now.append(StringUtils.join(subs, ",\n"));
 			if (!subs.isEmpty()) {
-				now.append("\n");
+				now.append("\n").append(StringUtils.join(subs, ",\n"))
+						.append("\n").append(prefix).append(spaces(deep));
 			}
-			now.append(prefix).append(spaces(deep)).append("]");
+			now.append("]");
 		} else {
 			now.append(node.toString());
 		}

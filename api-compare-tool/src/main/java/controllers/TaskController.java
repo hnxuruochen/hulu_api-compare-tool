@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import operators.ErrorOperator;
 import operators.TaskOperator;
 
+import org.dom4j.DocumentException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,9 +35,11 @@ public class TaskController {
 	 * Create a new task
 	 * 
 	 * @return Status and the created task's id in message.
+	 * @throws DocumentException
 	 */
 	@RequestMapping(value = "/api/tasks/new", method = RequestMethod.POST)
-	public Status newTask(HttpServletRequest request, @RequestBody Task task) {
+	public Status newTask(HttpServletRequest request, @RequestBody Task task)
+			throws DocumentException {
 		String user = Utils.getUserName(request);
 		task.setCreator(user);
 		int id = TASK.newTask(task);
@@ -91,10 +94,11 @@ public class TaskController {
 	 * Restart a task.
 	 * 
 	 * @return Status.
+	 * @throws DocumentException
 	 */
 	@RequestMapping("/api/tasks/restart")
 	public Status restartTask(HttpServletRequest request,
-			@RequestParam(value = "id") Integer id) {
+			@RequestParam(value = "id") Integer id) throws DocumentException {
 		String user = Utils.getUserName(request);
 		Task task = TASK.getTask(id);
 		if (task == null) {

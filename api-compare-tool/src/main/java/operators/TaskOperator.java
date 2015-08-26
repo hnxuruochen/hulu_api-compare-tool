@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dom4j.DocumentException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -15,13 +16,14 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import comparator.JsonComparator;
+import comparator.XmlComparator;
 import entities.Task;
 
 public enum TaskOperator {
 	INSTANCE;
 	private static final String BASIC_TASK = "id, creator, tag_id, time, type, errors_limit, errors_count, status";
 	private static final String FULL_TASK = BASIC_TASK
-			+ ", param1, param2, use_file, file_id, requests";
+			+ ", param1, param2, use_file, file_id, requests, is_xml";
 	private JdbcTemplate template = null;
 
 	TaskOperator() {
@@ -65,7 +67,7 @@ public enum TaskOperator {
 	}
 
 	public int newTask(Task task) {
-		String q = "INSERT INTO tasks(creator, tag_id, time, type, param1, param2, use_file, file_id, requests, errors_limit, status) VALUES (?, ?, CURRENT_TIMESTAMP(), ?, ?, ?, ?, ?, ?, ?, ?);";
+		String q = "INSERT INTO tasks(creator, tag_id, time, type, param1, param2, use_file, file_id, requests, is_xml, errors_limit, status) VALUES (?, ?, CURRENT_TIMESTAMP(), ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		// Get auto generated primary key.
 		KeyHolder id = new GeneratedKeyHolder();
 		template.update(new PreparedStatementCreator() {
@@ -82,8 +84,9 @@ public enum TaskOperator {
 				ps.setBoolean(6, task.getUseFile());
 				ps.setString(7, task.getFileId());
 				ps.setString(8, task.getRequests());
-				ps.setInt(9, task.getErrorsLimit());
-				ps.setInt(10, Task.Status.WATING);
+				ps.setBoolean(9, task.getIsXml());
+				ps.setInt(10, task.getErrorsLimit());
+				ps.setInt(11, Task.Status.WATING);
 				return ps;
 			}
 		}, id);
@@ -111,18 +114,23 @@ public enum TaskOperator {
 		}
 	}
 
-	public void executeTextTask(Task task) {
-		String output = JsonComparator.compare(task.getParam1(),
-				task.getParam2());
+	public void executeTextTask(Task task) throws DocumentException {
+		String output = null;
+		if (task.getIsXml()) {
+			output = XmlComparator.compare(task.getParam1(), task.getParam2());
+		} else {
+			output = JsonComparator.compare(task.getParam1(), task.getParam2());
+		}
+
 		if ((output != null) && (!output.startsWith("*"))) {
 			updateTask(task.getId(), 0, Task.Status.FINISHED);
 		} else {
-			String message = "Different json text.";
+			String message = "Different text.";
 			if (output == null) {
-				message = "Invalid json input.";
+				message = "Invalid input.";
 			}
 			ErrorOperator.INSTANCE.newError(task.getId(), message,
-					"Text compare.", output);
+					task.getIsXml(), "Text compare.", output);
 			updateTask(task.getId(), 1, Task.Status.FINISHED);
 		}
 	}

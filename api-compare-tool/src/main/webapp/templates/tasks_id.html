@@ -83,7 +83,7 @@
                 </div>
             </div>
         </div>
-        <div class="field" style="width: 20%;">
+        <div class="field" style="width: 25%;">
             <div class="ui labeled input">
                 <div class="ui label">
                     Type:
@@ -97,7 +97,11 @@
                 </div>
             </div>
         </div>
-        <div class="field" align="right" style="width: 30%;">
+        <div class="ui checkbox" style="width: 10%; margin-top: 10px;">
+            <input type="checkbox" ng-model="task.isXml" ng-disabled="savingTask || !editingTask">
+            <label>Restapi xml</label>
+        </div>
+        <div class="field" align="right" style="width: 15%;">
             <button class="ui button green" ng-click="editTask()" ng-hide="editingTask || userData.userAccount != task.creator" ng-disabled="savingTask || loadingTags">
                 Edit
             </button>
@@ -134,7 +138,7 @@
                 Requests:
             </div>
             <div class="ui checkbox">
-                <input type="checkbox" checked="" ng-model="task.useFile" ng-disabled="savingTask || !editingTask">
+                <input type="checkbox" ng-model="task.useFile" ng-disabled="savingTask || !editingTask">
                 <label>Use File</label>
             </div>
             <button class="ui button green small" style="margin-left: 100px;" ng-click="getUploadScript()">

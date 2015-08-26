@@ -106,7 +106,8 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
             param2: $scope.task.param2,
             useFile: $scope.task.useFile,
             fileId: $scope.task.fileId == "" ? null : $scope.task.fileId,
-            requests: $scope.task.requests
+            requests: $scope.task.requests,
+            isXml: $scope.task.isXml
         };
         $scope.savingTask = true;
         // If new task.

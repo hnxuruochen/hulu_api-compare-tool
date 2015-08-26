@@ -39,6 +39,7 @@ public class Task {
 				task.setRequests(rs.getString("requests"));
 				task.setUseFile(rs.getBoolean("use_file"));
 				task.setFileId(rs.getString("file_id"));
+				task.setIsXml(rs.getBoolean("is_xml"));
 			}
 			task.setType(rs.getInt("type"));
 			task.setErrorsLimit(rs.getInt("errors_limit"));
@@ -58,6 +59,7 @@ public class Task {
 	private String fileId = null;
 	private String requests = null;
 	private Integer type = null;
+	private Boolean isXml = null;
 	private Integer errorsLimit = null;
 	private Integer errorsCount = null;
 	private Integer status = null;
@@ -101,6 +103,10 @@ public class Task {
 
 	public void setType(Integer type) {
 		this.type = type;
+	}
+	
+	public void setIsXml(Boolean isXml) {
+		this.isXml = isXml;
 	}
 
 	public void setErrorsLimit(Integer errorsLimit) {
@@ -157,6 +163,10 @@ public class Task {
 
 	public Integer getType() {
 		return type;
+	}
+	
+	public Boolean getIsXml() {
+		return isXml;
 	}
 
 	public Integer getErrorsLimit() {
