@@ -36,8 +36,8 @@ mainApp.controller("layoutController", function($scope, $rootScope, $http) {
                 }
             });
             $rootScope.tagsIdMap = {};
-            for (var i = 0; i < data.length; i++) {
-                $rootScope.tagsIdMap[data[i].id] = data[i];
+            for (var i = 0; i < data.tags.length; i++) {
+                $rootScope.tagsIdMap[data.tags[i].id] = data.tags[i];
             }
         });
 });
