@@ -5,11 +5,20 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
+/**
+ * @author ruochen.xu
+ */
 public class Error {
-
+	/**
+	 * Mapper.
+	 */
 	public static class ErrorMapper implements RowMapper<Error> {
 		private boolean fullData = false;
 
+		/**
+		 * @param full
+		 *            Whether map full data.
+		 */
 		public ErrorMapper(boolean full) {
 			fullData = full;
 		}

@@ -5,6 +5,9 @@ import java.util.List;
 import entities.Status;
 import entities.Task;
 
+/**
+ * @author ruochen.xu
+ */
 public class TasksResponse {
 	private Status status = null;
 	private Task task = null;

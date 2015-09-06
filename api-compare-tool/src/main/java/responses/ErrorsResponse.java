@@ -3,7 +3,9 @@ package responses;
 import entities.Error;
 import entities.Status;
 
-
+/**
+ * @author ruochen.xu
+ */
 public class ErrorsResponse {
 	private Status status = null;
 	private Error error = null;

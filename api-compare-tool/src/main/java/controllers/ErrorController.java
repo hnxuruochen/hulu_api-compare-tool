@@ -14,7 +14,6 @@ import entities.Status;
  * Errors apis.
  * 
  * @author ruochen.xu
- *
  */
 @RestController
 public class ErrorController {
@@ -23,6 +22,7 @@ public class ErrorController {
 	/**
 	 * Get specified errors.
 	 * 
+	 * @param id
 	 * @return Status and Error.
 	 */
 	@RequestMapping("/api/errors/{id}")

@@ -5,8 +5,13 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.RowMapper;
 
+/**
+ * @author ruochen.xu
+ */
 public class Tag {
-
+	/**
+	 * Mapper. 
+	 */
 	public static class TagMapper implements RowMapper<Tag> {
 		@Override
 		public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -39,7 +44,7 @@ public class Tag {
 	public void setTime(String time) {
 		this.time = time;
 	}
-	
+
 	public Integer getId() {
 		return id;
 	}

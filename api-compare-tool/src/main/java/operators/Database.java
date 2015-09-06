@@ -10,6 +10,9 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import configs.Config;
 
+/**
+ * @author ruochen.xu
+ */
 public class Database {
 	public static DataSource getDataSrouce() {
 		DriverManagerDataSource source = new DriverManagerDataSource();
@@ -19,9 +22,11 @@ public class Database {
 		source.setPassword(Config.DB_PASSWD);
 		return source;
 	}
+
 	public static JdbcTemplate getTemplate() {
 		return new JdbcTemplate(getDataSrouce());
 	}
+
 	public static Connection getConneciont() throws SQLException {
 		return getDataSrouce().getConnection();
 	}

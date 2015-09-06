@@ -19,7 +19,6 @@ import entities.Tag;
  * Tags apis.
  * 
  * @author ruochen.xu
- *
  */
 @RestController
 public class TagController {
@@ -39,6 +38,8 @@ public class TagController {
 	/**
 	 * Add a new tag
 	 * 
+	 * @param request
+	 * @param name
 	 * @return Status and tag.
 	 */
 	@RequestMapping("/api/tags/new")
@@ -61,6 +62,9 @@ public class TagController {
 	/**
 	 * Update a tag.
 	 * 
+	 * @param request
+	 * @param id
+	 * @param name
 	 * @return Status and tag.
 	 */
 	@RequestMapping("/api/tags/update")
@@ -90,7 +94,9 @@ public class TagController {
 	/**
 	 * Delete a tag.
 	 * 
-	 * @return Status.
+	 * @param request
+	 * @param id
+	 * @return Status
 	 */
 	@RequestMapping("/api/tags/delete")
 	public Status deleteTag(HttpServletRequest request,

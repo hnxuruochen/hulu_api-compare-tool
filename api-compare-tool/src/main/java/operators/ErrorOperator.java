@@ -7,6 +7,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import entities.Error;
 
+/**
+ * @author ruochen.xu
+ */
 public enum ErrorOperator {
 	INSTANCE;
 	private static final String BASIC_ERROR = "id, task_id, time, message, is_xml, input";

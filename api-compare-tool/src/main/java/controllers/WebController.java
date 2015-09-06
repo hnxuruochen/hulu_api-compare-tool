@@ -13,13 +13,13 @@ import configs.Config;
  * Static apis.
  * 
  * @author ruochen.xu
- *
  */
 @Controller
 public class WebController implements ErrorController {
 	/**
 	 * Get user's login info.
 	 * 
+	 * @param request
 	 * @return Json string of user info.
 	 */
 	@RequestMapping("/api/user/info")

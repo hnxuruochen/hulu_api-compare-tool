@@ -25,7 +25,6 @@ import org.dom4j.Element;
  * line.
  * 
  * @author ruochen.xu
- *
  */
 public class XmlComparator {
 	private static int TAB_LEN = 4;
@@ -106,7 +105,7 @@ public class XmlComparator {
 	 * 
 	 * @param node
 	 * @return
-	 * @throws DocumentException 
+	 * @throws DocumentException
 	 */
 	private static boolean isArray(Element node) throws DocumentException {
 		Attribute type = node.attribute("type");

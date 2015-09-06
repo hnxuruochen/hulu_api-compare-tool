@@ -47,6 +47,7 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
         $scope.task.type = 0;
         $scope.task.useFile = false;
         $scope.task.errorsLimit = 1;
+        $scope.task.qps = 0;
         $scope.initializeTask();
     };
     // Fetch task object for current page.
@@ -98,6 +99,9 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
             $scope.task.param1 = $scope.task.text1;
             $scope.task.param2 = $scope.task.text2;
         }
+        if (isNaN($scope.task.qps)) {
+            $scope.task.qps = 0;
+        }
         var params = {
             tagId: $scope.task.tagId,
             errorsLimit: $scope.task.errorsLimit,
@@ -106,6 +110,7 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
             param2: $scope.task.param2,
             useFile: $scope.task.useFile,
             fileId: $scope.task.fileId == "" ? null : $scope.task.fileId,
+            qps: $scope.task.qps,
             requests: $scope.task.requests,
             isXml: $scope.task.isXml
         };

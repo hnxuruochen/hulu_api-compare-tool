@@ -15,6 +15,9 @@ import org.springframework.jdbc.support.KeyHolder;
 
 import entities.Tag;
 
+/**
+ * @author ruochen.xu
+ */
 public enum TagOperator {
 	INSTANCE;
 	private JdbcTemplate template = null;

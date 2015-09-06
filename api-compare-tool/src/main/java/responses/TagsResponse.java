@@ -5,6 +5,9 @@ import java.util.List;
 import entities.Status;
 import entities.Tag;
 
+/**
+ * @author ruochen.xu
+ */
 public class TagsResponse {
 	private Status status = null;
 	private List<Tag> tags = null;

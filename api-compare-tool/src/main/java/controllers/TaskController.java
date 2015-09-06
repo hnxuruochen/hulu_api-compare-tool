@@ -25,7 +25,6 @@ import entities.Task;
  * Tasks apis.
  * 
  * @author ruochen.xu
- *
  */
 @RestController
 public class TaskController {
@@ -34,6 +33,8 @@ public class TaskController {
 	/**
 	 * Create a new task
 	 * 
+	 * @param request
+	 * @param task
 	 * @return Status and the created task's id in message.
 	 * @throws DocumentException
 	 */
@@ -53,6 +54,8 @@ public class TaskController {
 	/**
 	 * Update a task.
 	 * 
+	 * @param request
+	 * @param task
 	 * @return Status and updated task.
 	 */
 	@RequestMapping(value = "/api/tasks/update", method = RequestMethod.POST)
@@ -73,6 +76,7 @@ public class TaskController {
 	/**
 	 * Get creator of a task. This api dosen't require authentication.
 	 * 
+	 * @param id
 	 * @return The creator.
 	 */
 	@RequestMapping("/api/tasks/get_creator")
@@ -93,6 +97,8 @@ public class TaskController {
 	/**
 	 * Restart a task.
 	 * 
+	 * @param request
+	 * @param id
 	 * @return Status.
 	 * @throws DocumentException
 	 */
@@ -124,6 +130,9 @@ public class TaskController {
 	/**
 	 * Search tasks. Null for all.
 	 * 
+	 * @param creator
+	 * @param tags
+	 * @param status
 	 * @return Tasks meet requirements.
 	 */
 	@RequestMapping("/api/tasks/search")
@@ -143,6 +152,7 @@ public class TaskController {
 	/**
 	 * Get the specified task.
 	 * 
+	 * @param id
 	 * @return Task.
 	 */
 	@RequestMapping("/api/tasks/{id}")

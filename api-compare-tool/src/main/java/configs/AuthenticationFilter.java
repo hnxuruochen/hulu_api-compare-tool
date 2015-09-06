@@ -21,6 +21,9 @@ import com.google.gson.JsonObject;
 import com.hulu.sso.HuluAuthException;
 import com.hulu.sso.Sso;
 
+/**
+ * @author ruochen.xu
+ */
 @Configuration
 public class AuthenticationFilter implements Filter {
 	public static final String LOGIN_SERVER = "https://login.hulu.com";

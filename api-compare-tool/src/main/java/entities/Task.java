@@ -6,7 +6,13 @@ import java.util.List;
 
 import org.springframework.jdbc.core.RowMapper;
 
+/**
+ * @author ruochen.xu
+ */
 public class Task {
+	/**
+	 * Task status.
+	 */
 	public class Status {
 		public static final int PREPARING = 0;
 		public static final int WATING = 1;
@@ -14,14 +20,24 @@ public class Task {
 		public static final int FINISHED = 3;
 	}
 
+	/**
+	 * Task type.
+	 */
 	public class Type {
 		public static final int TEXT = 0;
 		public static final int SERVICE = 1;
 	}
 
+	/**
+	 * Mapper.
+	 */
 	public static class TaskMapper implements RowMapper<Task> {
 		private boolean fullData = false;
 
+		/**
+		 * @param full
+		 *            Whether map full data.
+		 */
 		public TaskMapper(boolean full) {
 			fullData = full;
 		}
@@ -40,6 +56,7 @@ public class Task {
 				task.setUseFile(rs.getBoolean("use_file"));
 				task.setFileId(rs.getString("file_id"));
 				task.setIsXml(rs.getBoolean("is_xml"));
+				task.setQps(rs.getDouble("qps"));
 			}
 			task.setType(rs.getInt("type"));
 			task.setErrorsLimit(rs.getInt("errors_limit"));
@@ -60,6 +77,7 @@ public class Task {
 	private String requests = null;
 	private Integer type = null;
 	private Boolean isXml = null;
+	private Double qps = null;
 	private Integer errorsLimit = null;
 	private Integer errorsCount = null;
 	private Integer status = null;
@@ -104,9 +122,13 @@ public class Task {
 	public void setType(Integer type) {
 		this.type = type;
 	}
-	
+
 	public void setIsXml(Boolean isXml) {
 		this.isXml = isXml;
+	}
+
+	public void setQps(Double qps) {
+		this.qps = qps;
 	}
 
 	public void setErrorsLimit(Integer errorsLimit) {
@@ -164,9 +186,13 @@ public class Task {
 	public Integer getType() {
 		return type;
 	}
-	
+
 	public Boolean getIsXml() {
 		return isXml;
+	}
+
+	public Double getQps() {
+		return qps;
 	}
 
 	public Integer getErrorsLimit() {

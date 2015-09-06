@@ -19,11 +19,14 @@ import comparator.JsonComparator;
 import comparator.XmlComparator;
 import entities.Task;
 
+/**
+ * @author ruochen.xu
+ */
 public enum TaskOperator {
 	INSTANCE;
 	private static final String BASIC_TASK = "id, creator, tag_id, time, type, errors_limit, errors_count, status";
 	private static final String FULL_TASK = BASIC_TASK
-			+ ", param1, param2, use_file, file_id, requests, is_xml";
+			+ ", param1, param2, use_file, file_id, qps, requests, is_xml";
 	private JdbcTemplate template = null;
 
 	TaskOperator() {
@@ -67,7 +70,7 @@ public enum TaskOperator {
 	}
 
 	public int newTask(Task task) {
-		String q = "INSERT INTO tasks(creator, tag_id, time, type, param1, param2, use_file, file_id, requests, is_xml, errors_limit, status) VALUES (?, ?, CURRENT_TIMESTAMP(), ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		String q = "INSERT INTO tasks(creator, tag_id, time, type, param1, param2, use_file, file_id, qps, requests, is_xml, errors_limit, status) VALUES (?, ?, CURRENT_TIMESTAMP(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		// Get auto generated primary key.
 		KeyHolder id = new GeneratedKeyHolder();
 		template.update(new PreparedStatementCreator() {
@@ -83,10 +86,11 @@ public enum TaskOperator {
 				ps.setString(5, task.getParam2());
 				ps.setBoolean(6, task.getUseFile());
 				ps.setString(7, task.getFileId());
-				ps.setString(8, task.getRequests());
-				ps.setBoolean(9, task.getIsXml());
-				ps.setInt(10, task.getErrorsLimit());
-				ps.setInt(11, Task.Status.WATING);
+				ps.setDouble(8, task.getQps());
+				ps.setString(9, task.getRequests());
+				ps.setBoolean(10, task.getIsXml());
+				ps.setInt(11, task.getErrorsLimit());
+				ps.setInt(12, Task.Status.WATING);
 				return ps;
 			}
 		}, id);
@@ -94,10 +98,11 @@ public enum TaskOperator {
 	}
 
 	public void updateTask(Task task) {
-		String q = "UPDATE tasks SET tag_id = ?, time = CURRENT_TIMESTAMP(), type = ?, param1 = ?, param2 = ?, use_file = ?, file_id = ?, requests = ?, errors_limit = ? WHERE id = ?;";
+		String q = "UPDATE tasks SET tag_id = ?, time = CURRENT_TIMESTAMP(), type = ?, param1 = ?, param2 = ?, use_file = ?, file_id = ?, qps = ?, requests = ?, errors_limit = ? WHERE id = ?;";
 		template.update(q, task.getTagId(), task.getType(), task.getParam1(),
 				task.getParam2(), task.getUseFile(), task.getFileId(),
-				task.getRequests(), task.getErrorsLimit(), task.getId());
+				task.getQps(), task.getRequests(), task.getErrorsLimit(),
+				task.getId());
 	}
 
 	public void updateTask(int id, int errorsCount, int status) {

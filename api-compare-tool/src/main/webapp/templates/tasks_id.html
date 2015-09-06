@@ -115,8 +115,16 @@
     </div>
     <!-- Service info -->
     <div class="field" ng-show="task.type">
-        <div class="two fields">
-            <div class="field">
+        <div class="fields">
+            <div class="field" style="width: 10%;">
+                <div class="ui labeled input">
+                    <div class="ui label">
+                        QPS
+                    </div>
+                    <input type="text" ng-model="task.qps" ng-disabled="savingTask || !editingTask">
+                </div>
+            </div>
+            <div class="field" style="width: 45%;">
                 <div class="ui labeled input">
                     <div class="ui label">
                         Address 1:
@@ -124,7 +132,7 @@
                     <input type="text" ng-model="task.address1" ng-disabled="savingTask || !editingTask">
                 </div>
             </div>
-            <div class="field">
+            <div class="field" style="width: 45%;">
                 <div class="ui labeled input">
                     <div class="ui label">
                         Address 2:

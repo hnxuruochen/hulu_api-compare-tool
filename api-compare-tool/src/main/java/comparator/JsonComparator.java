@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * of each line.
  * 
  * @author ruochen.xu
- *
  */
 public class JsonComparator {
 	private static int TAB_LEN = 4;
