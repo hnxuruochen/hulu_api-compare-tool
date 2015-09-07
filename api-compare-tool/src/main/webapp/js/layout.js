@@ -40,5 +40,9 @@ mainApp.controller("layoutController", function($scope, $rootScope, $http) {
                 $rootScope.tagsIdMap[data.tags[i].id] = data.tags[i];
             }
         });
+    // It's another frontend.        
+    $scope.goToSwagger = function() {
+        window.location.href = "/swagger/index.html";
+    };
 });
 $(document).ready(function($) {});
