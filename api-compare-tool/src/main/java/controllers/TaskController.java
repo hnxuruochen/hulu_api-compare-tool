@@ -79,7 +79,7 @@ public class TaskController {
 	 * @param id
 	 * @return The creator.
 	 */
-	@RequestMapping("/api/tasks/get_creator")
+	@RequestMapping(value = "/api/tasks/get_creator", method = RequestMethod.GET)
 	@ResponseBody
 	public String getTaskCreator(@RequestParam(value = "id") String id) {
 		String creator = null;
@@ -102,7 +102,7 @@ public class TaskController {
 	 * @return Status.
 	 * @throws DocumentException
 	 */
-	@RequestMapping("/api/tasks/restart")
+	@RequestMapping(value = "/api/tasks/restart", method = RequestMethod.GET)
 	public Status restartTask(HttpServletRequest request,
 			@RequestParam(value = "id") Integer id) throws DocumentException {
 		String user = Utils.getUserName(request);
@@ -135,7 +135,7 @@ public class TaskController {
 	 * @param status
 	 * @return Tasks meet requirements.
 	 */
-	@RequestMapping("/api/tasks/search")
+	@RequestMapping(value = "/api/tasks/search", method = RequestMethod.GET)
 	public TasksResponse searchTasks(
 			@RequestParam(value = "creator") String creator,
 			@RequestParam(value = "tags") String tags,
@@ -155,7 +155,7 @@ public class TaskController {
 	 * @param id
 	 * @return Task.
 	 */
-	@RequestMapping("/api/tasks/{id}")
+	@RequestMapping(value = "/api/tasks/{id}", method = RequestMethod.GET)
 	public TasksResponse getTask(@PathVariable(value = "id") Integer id) {
 		Task task = TASK.getTask(id);
 		return new TasksResponse(new Status(task != null), task);

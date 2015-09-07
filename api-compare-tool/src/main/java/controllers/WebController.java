@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.boot.autoconfigure.web.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import configs.Config;
@@ -22,7 +23,7 @@ public class WebController implements ErrorController {
 	 * @param request
 	 * @return Json string of user info.
 	 */
-	@RequestMapping("/api/user/info")
+	@RequestMapping(value = "/api/user/info", method = RequestMethod.GET)
 	@ResponseBody
 	public String getUserInfo(HttpServletRequest request) {
 		return request.getAttribute(Config.USER_DATA).toString();
@@ -33,7 +34,7 @@ public class WebController implements ErrorController {
 	 * 
 	 * @return layout template.
 	 */
-	@RequestMapping("/error")
+	@RequestMapping(value = "/error")
 	public String error() {
 		// If frontend's html5mode is disabled, just add the # tag and redirect.
 		// return "redirect:/#" + request.getRequestURI();

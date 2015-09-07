@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import operators.TagOperator;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,7 +30,7 @@ public class TagController {
 	 * 
 	 * @return List of tags.
 	 */
-	@RequestMapping("/api/tags")
+	@RequestMapping(value = "/api/tags", method = RequestMethod.GET)
 	public TagsResponse getTags() {
 		List<Tag> tags = TAG.getAllTags();
 		return new TagsResponse(new Status(tags != null), tags);
@@ -42,7 +43,7 @@ public class TagController {
 	 * @param name
 	 * @return Status and tag.
 	 */
-	@RequestMapping("/api/tags/new")
+	@RequestMapping(value = "/api/tags/new", method = RequestMethod.GET)
 	public TagsResponse newTag(HttpServletRequest request,
 			@RequestParam(value = "name") String name) {
 		String user = Utils.getUserName(request);
@@ -67,7 +68,7 @@ public class TagController {
 	 * @param name
 	 * @return Status and tag.
 	 */
-	@RequestMapping("/api/tags/update")
+	@RequestMapping(value = "/api/tags/update", method = RequestMethod.GET)
 	public TagsResponse modifyTag(HttpServletRequest request,
 			@RequestParam(value = "id") Integer id,
 			@RequestParam(value = "name") String name) {
@@ -98,7 +99,7 @@ public class TagController {
 	 * @param id
 	 * @return Status
 	 */
-	@RequestMapping("/api/tags/delete")
+	@RequestMapping(value = "/api/tags/delete", method = RequestMethod.GET)
 	public Status deleteTag(HttpServletRequest request,
 			@RequestParam(value = "id") Integer id) {
 		String user = Utils.getUserName(request);

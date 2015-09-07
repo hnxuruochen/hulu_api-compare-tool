@@ -4,6 +4,7 @@ import operators.ErrorOperator;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import responses.ErrorsResponse;
@@ -25,7 +26,7 @@ public class ErrorController {
 	 * @param id
 	 * @return Status and Error.
 	 */
-	@RequestMapping("/api/errors/{id}")
+	@RequestMapping(value = "/api/errors/{id}", method = RequestMethod.GET)
 	public ErrorsResponse getError(@PathVariable(value = "id") Integer id) {
 		Error error = ERROR.getError(id);
 		Status status = new Status(error != null);
