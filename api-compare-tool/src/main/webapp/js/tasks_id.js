@@ -48,6 +48,8 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
         $scope.task.useFile = false;
         $scope.task.errorsLimit = 1;
         $scope.task.qps = 0;
+        $scope.task.isXml = 0;
+        $scope.task.fileId = "";
         $scope.initializeTask();
     };
     // Fetch task object for current page.
@@ -143,7 +145,7 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
                 });
         }
     };
-    $scope.scriptUsage = "Usage: upload.sh <task id> <file path>";
+    $scope.scriptUsage = "Please create task fitst. Usage: upload.sh <task id> <local file path>";
     $scope.getUploadScript = function() {
         window.location.href = "/upload.sh";
     };
