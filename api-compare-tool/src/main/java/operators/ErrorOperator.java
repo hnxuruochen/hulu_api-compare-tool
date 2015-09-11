@@ -13,7 +13,7 @@ import entities.Error;
 public enum ErrorOperator {
 	INSTANCE;
 	private static final String BASIC_ERROR = "id, task_id, time, message, is_xml, input";
-	private static final String FULL_ERROR = BASIC_ERROR + ", output";
+	private static final String FULL_ERROR = BASIC_ERROR + ", output, header";
 	private JdbcTemplate template = null;
 
 	ErrorOperator() {
@@ -35,9 +35,9 @@ public enum ErrorOperator {
 		return error;
 	}
 
-	public void newError(int taskId, String message, Boolean isXml, String input, String output) {
-		String q = "INSERT INTO errors(task_id, time, message, is_xml, input, output) VALUES (?, CURRENT_TIMESTAMP(), ?, ?, ?, ?);";
-		template.update(q, taskId, message, isXml, input, output);
+	public void newError(int taskId, String message, Boolean isXml, String input, String output, String header) {
+		String q = "INSERT INTO errors(task_id, time, message, is_xml, input, output, header) VALUES (?, CURRENT_TIMESTAMP(), ?, ?, ?, ?, ?);";
+		template.update(q, taskId, message, isXml, input, output, header);
 	}
 
 	public void deleteErrorOfTask(int taskId) {

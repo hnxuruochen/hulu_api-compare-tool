@@ -34,6 +34,7 @@ public class Error {
 			error.setInput(rs.getString("input"));
 			if (fullData) {
 				error.setOutput(rs.getString("output"));
+				error.setHeader(rs.getString("header"));
 			}
 			return error;
 		}
@@ -46,6 +47,7 @@ public class Error {
 	private Boolean isXml = null;
 	private String input = null;
 	private String output = null;
+	private String header = null;
 
 	public void setId(Integer id) {
 		this.id = id;
@@ -75,6 +77,10 @@ public class Error {
 		this.output = output;
 	}
 
+	public void setHeader(String header) {
+		this.header = header;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -102,4 +108,9 @@ public class Error {
 	public String getOutput() {
 		return output;
 	}
+
+	public String getHeader() {
+		return header;
+	}
+
 }

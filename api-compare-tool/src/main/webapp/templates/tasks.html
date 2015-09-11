@@ -35,10 +35,7 @@
                     <i class="dropdown icon"></i>
                     <div class="default text">All</div>
                     <div class="menu">
-                        <div class="item" data-value="0">preparing</div>
-                        <div class="item" data-value="1">wating</div>
-                        <div class="item" data-value="2">running</div>
-                        <div class="item" data-value="3">finished</div>
+                        <div class="item" ng-repeat="s in status" data-value="{{$index}}">{{s}}</div>
                     </div>
                 </div>
             </div>

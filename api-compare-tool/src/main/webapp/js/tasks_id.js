@@ -49,6 +49,8 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
         $scope.task.errorsLimit = 1;
         $scope.task.qps = 0;
         $scope.task.isXml = 0;
+        $scope.task.includeHeaders = 0;
+        $scope.task.headers = "";
         $scope.task.fileId = "";
         $scope.initializeTask();
     };
@@ -114,7 +116,9 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
             fileId: $scope.task.fileId == "" ? null : $scope.task.fileId,
             qps: $scope.task.qps,
             requests: $scope.task.requests,
-            isXml: $scope.task.isXml
+            isXml: $scope.task.isXml,
+            includeHeaders: $scope.task.includeHeaders,
+            headers: $scope.task.headers == "" ? null : $scope.task.headers
         };
         $scope.savingTask = true;
         // If new task.

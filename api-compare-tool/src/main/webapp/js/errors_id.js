@@ -1,6 +1,7 @@
 "use strict";
 mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $compile, $location) {
     $scope.loadingData = true;
+    $scope.part = ["output", "header"];
     // Load error data.
     $http.get("/api/errors/" + $routeParams.id)
         .success(function(data) {
@@ -9,16 +10,24 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
             } else {
                 $scope.error = data.error;
                 $scope.loadingData = false;
-                $scope.renderErrorView();
+                $scope.lineStyle = [];
+                if ($scope.error.output != null) {
+                    $scope.error.output = $scope.error.output.split("\n");
+                }
+                $scope.renderErrorView($scope.error.output, 0);
+                if ($scope.error.header != null) {
+                    $scope.error.header = $scope.error.header.split("\n");
+                }
+                $scope.renderErrorView($scope.error.header, 1);
             }
         });
     // Expand or collapse a block.
-    $scope.toggleExpand = function(line) {
-        $scope.lineStyle[line].expand = !$scope.lineStyle[line].expand;
+    $scope.toggleExpand = function(id, line) {
+        $scope.lineStyle[id][line].expand = !$scope.lineStyle[id][line].expand;
     };
     // Check whether a line is a block start.
-    $scope.isContentStart = function(line) {
-        if ($scope.error.isXml) {
+    $scope.isContentStart = function(line, isHeader) {
+        if (($scope.error.isXml) && (!isHeader)) {
             if (line.endsWith("/>")) {
                 return false;
             }
@@ -41,8 +50,8 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
         return true;
     };
     // Check whether a line is a block end.
-    $scope.isContentEnd = function(line) {
-        if ($scope.error.isXml) {
+    $scope.isContentEnd = function(line, isHeader) {
+        if (($scope.error.isXml) && (!isHeader)) {
             if (line.startsWith("</")) {
                 return true;
             }
@@ -70,15 +79,13 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
         }
         return "";
     };
-    $scope.renderErrorView = function() {
-        if ($scope.error.output == null) {
+    $scope.renderErrorView = function(lines, id) {
+        if (lines == null) {
             return;
         }
         // Initialize.
         var errorHtml = "";
-        $scope.error.output = $scope.error.output.split("\n");
-        var lines = $scope.error.output;
-        $scope.lineStyle = [];
+        $scope.lineStyle[id] = [];
         // Add html one line by one line.
         for (var i = 0; i < lines.length; i++) {
             var style = {};
@@ -93,38 +100,38 @@ mainApp.controller("ErrorsIdController", function($scope, $routeParams, $http, $
             var blockEnd = "";
             var omit = "";
             var body = "";
-            if ($scope.isContentEnd(lines[i])) {
+            if ($scope.isContentEnd(lines[i], id == 1)) {
                 // End a sub content area.
                 blockEnd = "</span>";
             }
-            if ($scope.isContentStart(lines[i])) {
+            if ($scope.isContentStart(lines[i], id == 1)) {
                 // Show mixed content by default.
                 style.expand = style.color == " mixed";
                 // Add expand button.
-                body = "<span ng-click=\"toggleExpand(" + i + ")\">";
-                body = body + "<span><i class=\"minus small icon\" ng-show=\"lineStyle[" + i + "].expand\"></i></span>";
-                body = body + "<span><i class=\"plus small icon\" ng-show=\"!lineStyle[" + i + "].expand\"></i></span>";
+                body = "<span ng-click=\"toggleExpand(" + id + ", " + i + ")\">";
+                body = body + "<span><i class=\"minus small icon\" ng-show=\"lineStyle[" + id + "][" + i + "].expand\"></i></span>";
+                body = body + "<span><i class=\"plus small icon\" ng-show=\"!lineStyle[" + id + "][" + i + "].expand\"></i></span>";
                 body = body + "</span>";
                 // Add omit block.
-                omit = "<span ng-show=\"!lineStyle[" + i + "].expand\" style=\"margin-right: " + (-style.margin - 20) + "px;\">...</span>";
+                omit = "<span ng-show=\"!lineStyle[" + id + "][" + i + "].expand\" style=\"margin-right: " + (-style.margin - 20) + "px;\">...</span>";
                 // Start a sub content area.
-                blockStart = "<span ng-show=\"lineStyle[" + i + "].expand\">";
+                blockStart = "<span ng-show=\"lineStyle[" + id + "][" + i + "].expand\">";
                 // Show omit when collapse the sub content.
             } else {
                 // Add margin to align text.
                 style.margin += 20;
             }
             // Line content.
-            body = body + "<span>{{error.output[" + i + "]}}</span>" + omit;
+            body = body + "<span>{{error." + $scope.part[id] + "[" + i + "]}}</span>" + omit;
             // Wrap div with color and margin.
             body = "<span class=\"error-line " + style.color + "\" style=\"margin-left: " + style.margin + "px;\">" + body + "</span>";
             // Add end and start tag, breakline.
             body = blockEnd + body + blockStart + "</br>";
             errorHtml = errorHtml + body;
-            $scope.lineStyle.push(style);
+            $scope.lineStyle[id].push(style);
         }
         // Compile html code.
-        var ele = angular.element(document.getElementById("display-error"));
+        var ele = angular.element(document.getElementById("error-" + $scope.part[id]));
         ele.append(errorHtml);
         $compile(ele)($scope);
     };

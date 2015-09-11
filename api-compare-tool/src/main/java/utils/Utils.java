@@ -1,11 +1,16 @@
 package utils;
 
 import java.io.IOException;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import configs.Config;
 
@@ -53,5 +58,17 @@ public class Utils {
 			e.printStackTrace();
 		}
 		return body;
+	}
+
+	public static String getHttpResponseHeaderToJson(HttpResponse response,
+			Set<String> headers) {
+		ObjectNode node = JsonNodeFactory.instance.objectNode();
+		for (Header h : response.getAllHeaders()) {
+			String name = h.getName().toLowerCase();
+			if ((headers == null) || (headers.contains(name))) {
+				node.set(name, JsonNodeFactory.instance.textNode(h.getValue()));
+			}
+		}
+		return node.toString();
 	}
 }

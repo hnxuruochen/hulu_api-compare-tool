@@ -1,6 +1,8 @@
 <link rel="stylesheet" type="text/css" href="css/errors_id.css" />
 <div class="ui form" style="width:90%; margin: auto;" ng-class="{loading: loadingData}">
     <!-- Basic error info -->
+    <h3 style="margin-top: 0px;"> Basic Info </h3>
+    <div class="ui divider"></div>
     <div class="three fields">
         <div class="field" style="width: 10%;">
             <div class="ui large label" style="margin-right: 10px;">
@@ -33,7 +35,11 @@
         </div>
         {{error.input}}
     </div>
-    <div class="ui divider"></div>
     <!-- Error view -->
-    <div id="display-error"></div>
+    <h3 style="margin-top: 0px;"> Error Output </h3>
+    <div class="ui divider"></div>
+    <div id="error-output"></div>
+    <h3 style="margin-top: 10px;" ng-show="error.header != null"> Error Header </h3>
+    <div class="ui divider" ng-show="error.header != null"></div>
+    <div id="error-header"></div>
 </div>

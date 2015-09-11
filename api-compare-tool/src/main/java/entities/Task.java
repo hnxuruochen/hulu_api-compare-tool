@@ -55,6 +55,8 @@ public class Task {
 				task.setRequests(rs.getString("requests"));
 				task.setUseFile(rs.getBoolean("use_file"));
 				task.setFileId(rs.getString("file_id"));
+				task.setIncludeHeaders(rs.getBoolean("include_headers"));
+				task.setHeaders(rs.getString("headers"));
 				task.setIsXml(rs.getBoolean("is_xml"));
 				task.setQps(rs.getDouble("qps"));
 			}
@@ -76,6 +78,8 @@ public class Task {
 	private String fileId = null;
 	private String requests = null;
 	private Integer type = null;
+	private String headers = null;
+	private Boolean includeHeaders = null;
 	private Boolean isXml = null;
 	private Double qps = null;
 	private Integer errorsLimit = null;
@@ -121,6 +125,15 @@ public class Task {
 
 	public void setType(Integer type) {
 		this.type = type;
+	}
+
+
+	public void setIncludeHeaders(Boolean includeHeaders) {
+		this.includeHeaders = includeHeaders;
+	}
+	
+	public void setHeaders(String headers) {
+		this.headers = headers;
 	}
 
 	public void setIsXml(Boolean isXml) {
@@ -185,6 +198,14 @@ public class Task {
 
 	public Integer getType() {
 		return type;
+	}
+
+	public Boolean getIncludeHeaders() {
+		return includeHeaders;
+	}
+	
+	public String getHeaders() {
+		return headers;
 	}
 
 	public Boolean getIsXml() {

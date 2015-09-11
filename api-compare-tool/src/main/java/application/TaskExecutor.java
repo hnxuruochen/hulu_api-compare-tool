@@ -3,13 +3,13 @@ package application;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
@@ -47,7 +47,8 @@ public class TaskExecutor implements Runnable {
 	 * A single compare task with a uri between two service.
 	 */
 	private class CompareTask {
-		private String firstOutput = null;
+		private String firstBody = null;
+		private String firstHeader = null;
 		private String uri = null;
 
 		/**
@@ -65,22 +66,27 @@ public class TaskExecutor implements Runnable {
 		 * @param sa
 		 * @param sb
 		 */
-		private void compare(String sa, String sb) {
+		private void compare(String sa, String sb, String ha, String hb) {
 			String output = null;
+			String header = null;
+			// Compare header if it's not null.
+			if (ha != null) {
+				header = JsonComparator.compare(ha, hb);
+			}
 			if (task.getIsXml()) {
 				// Get Xmls.
 				Document a = null;
 				try {
 					a = DocumentHelper.parseText(sa);
 				} catch (DocumentException e) {
-					addError("Xml1 invalid.", uri, output);
+					addError("Xml1 invalid.", uri, output, header);
 					return;
 				}
 				Document b = null;
 				try {
 					b = DocumentHelper.parseText(sb);
 				} catch (DocumentException e) {
-					addError("Xml2 invalid.", uri, output);
+					addError("Xml2 invalid.", uri, output, header);
 					return;
 				}
 				try {
@@ -88,7 +94,7 @@ public class TaskExecutor implements Runnable {
 							b.getRootElement());
 				} catch (DocumentException e) {
 					addError("Xml invalid, need handle special case.", uri,
-							output);
+							output, header);
 					System.out.println(e.getMessage());
 					return;
 				}
@@ -98,21 +104,22 @@ public class TaskExecutor implements Runnable {
 				try {
 					a = objectMapper.readTree(sa);
 				} catch (IOException e) {
-					addError("Json1 invalid.", uri, output);
+					addError("Json1 invalid.", uri, output, header);
 					return;
 				}
 				JsonNode b = null;
 				try {
 					b = objectMapper.readTree(sb);
 				} catch (IOException e) {
-					addError("Json2 invalid", uri, output);
+					addError("Json2 invalid", uri, output, header);
 					return;
 				}
 				output = JsonComparator.compare(a, b);
 			}
 			// Record different text.
-			if (output.startsWith("*")) {
-				addError("Different text.", uri, output);
+			if (output.startsWith("*")
+					|| ((header != null) && (header.startsWith("*")))) {
+				addError("Different text.", uri, output, header);
 				return;
 			}
 		}
@@ -124,15 +131,16 @@ public class TaskExecutor implements Runnable {
 		 *            Mark it's the first or second request.
 		 * @param output
 		 */
-		synchronized void setOutput(int id, String output) {
-			if (firstOutput == null) {
-				firstOutput = output;
+		synchronized void setOutput(int id, String body, String header) {
+			if (firstBody == null) {
+				firstBody = body;
+				firstHeader = header;
 			} else {
 				// Arrange compare order according to the id.
 				if (id == 2) {
-					compare(firstOutput, output);
+					compare(firstBody, body, firstHeader, header);
 				} else {
-					compare(output, firstOutput);
+					compare(body, firstBody, header, firstHeader);
 				}
 				// Finish a task, release the lock.
 				releaseLock(false);
@@ -162,19 +170,25 @@ public class TaskExecutor implements Runnable {
 
 		@Override
 		public void completed(HttpResponse response) {
-			compareTask.setOutput(id, Utils.getHttpResponseBody(response));
+			String header = null;
+			// Get header if it also need compare.
+			if (task.getIncludeHeader()) {
+				header = Utils.getHttpResponseHeaderToJson(response, headers);
+			}
+			compareTask.setOutput(id, Utils.getHttpResponseBody(response),
+					header);
 		}
 
 		@Override
 		public void failed(Exception ex) {
-			compareTask.setOutput(id, "");
+			compareTask.setOutput(id, "", null);
 		}
 
 		@Override
 		public void cancelled() {
 			// Unexpected.
 			System.err.println("Http request cancelled unexpectly.");
-			compareTask.setOutput(id, "");
+			compareTask.setOutput(id, "", null);
 		}
 	}
 
@@ -188,6 +202,7 @@ public class TaskExecutor implements Runnable {
 	private TaskMapper taskMapper = null;
 
 	private Task task = null;
+	private Set<String> headers = null;
 	private CloseableHttpAsyncClient httpClient = null;
 	private CountDownLatch latch = null;
 	private Semaphore requestSemaphore = null;
@@ -229,37 +244,22 @@ public class TaskExecutor implements Runnable {
 
 	/**
 	 * Compare one uri of two apis.
+	 * 
+	 * @throws InterruptedException
 	 */
-	private void compare(String uri) {
+	private void compare(String uri) throws InterruptedException {
 		// Ensure api address end with /.
 		if (!uri.startsWith("/")) {
 			uri = uri + "/";
 		}
-		// Get urls.
-		URI ua = null;
-		try {
-			ua = new URI(task.getParam1() + uri);
-		} catch (URISyntaxException e1) {
-			addError("Address1 invalid.", uri, null);
-			return;
-		}
-		URI ub = null;
-		try {
-			ub = new URI(task.getParam2() + uri);
-		} catch (URISyntaxException e) {
-			addError("Address2 invalid.", uri, null);
-			return;
-		}
 		waitForQpsLimit();
-		try {
-			// Get lock.
-			requestSemaphore.acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		// Get lock.
+		requestSemaphore.acquire();
 		CompareTask cTask = new CompareTask(uri);
-		httpClient.execute(new HttpGet(ua), new HttpRequestCallBack(cTask, 1));
-		httpClient.execute(new HttpGet(ub), new HttpRequestCallBack(cTask, 2));
+		httpClient.execute(new HttpGet(task.getParam1() + uri),
+				new HttpRequestCallBack(cTask, 1));
+		httpClient.execute(new HttpGet(task.getParam2() + uri),
+				new HttpRequestCallBack(cTask, 2));
 	}
 
 	/**
@@ -305,19 +305,32 @@ public class TaskExecutor implements Runnable {
 	 * @param uri
 	 * @param output
 	 */
-	private void addError(String text, String uri, String output) {
+	private void addError(String text, String uri, String output, String header) {
 		if (moreError(true)) {
-			ERROR.newError(task.getId(), text, task.getIsXml(), uri, output);
+			ERROR.newError(task.getId(), text, task.getIsXml(), uri, output,
+					header);
 		}
 	}
 
 	/**
 	 * Execute a task.
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
 	 */
-	private void work() throws SQLException {
-		// Initialize lock, client.
+	private void work() throws SQLException, IOException, InterruptedException {
+		// Initialize lock, client, headers need check.
 		requestSemaphore = new Semaphore(Config.REQUESTS_LIMIT);
 		task.setErrorsCount(0);
+		headers = null;
+		if (task.getHeaders() != null) {
+			headers = new HashSet<String>();
+			for (String h : task.getHeaders().split("\n")) {
+				if (!h.trim().isEmpty()) {
+					headers.add(h.toLowerCase());
+				}
+			}
+		}
 		httpClient = HttpAsyncClients.custom()
 				.setDefaultRequestConfig(REQUEST_CONFIG).build();
 		httpClient.start();
@@ -355,12 +368,9 @@ public class TaskExecutor implements Runnable {
 		}
 		// Create latch.
 		releaseLock(true);
-		try {
-			// Waiting for requests.
-			latch.await();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		// Wait for requests.
+		latch.await();
+		httpClient.close();
 		TaskOperator.INSTANCE.updateTask(task.getId(), task.getErrorsCount(),
 				Task.Status.FINISHED);
 	}
@@ -391,8 +401,9 @@ public class TaskExecutor implements Runnable {
 					Thread.sleep(Config.TASK_SLEEP_TIME);
 				}
 			}
-		} catch (SQLException | InterruptedException e) {
+		} catch (SQLException | InterruptedException | IOException e) {
 			e.printStackTrace();
+			return;
 		}
 	}
 }

@@ -156,6 +156,11 @@
             <input type="text" placeHolder="Task ID, empty for current task" ng-model="task.fileId" ng-disabled="savingTask || !editingTask || !task.useFile">
             <textarea ng-model="task.requests" placeHolder="Requests" ng-disabled="savingTask || !editingTask || task.useFile"></textarea>
         </div>
+        <div class="ui checkbox">
+            <input type="checkbox" ng-model="task.includeHeaders" ng-disabled="savingTask || !editingTask">
+            <label>Check Headers</label>
+        </div>
+        <textarea ng-model="task.headers" placeHolder="A header per line to check, null for all" ng-disabled="savingTask || !editingTask || !task.includeHeader"></textarea>
     </div>
     <!-- Text info -->
     <div class="field" ng-hide="task.type">

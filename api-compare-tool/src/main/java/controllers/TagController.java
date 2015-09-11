@@ -51,6 +51,10 @@ public class TagController {
 			return new TagsResponse(new Status(false,
 					"Name can't be empty string."), (Tag) null);
 		}
+		if (name.length() > 32) {
+			return new TagsResponse(new Status(false,
+					"Name length be longer than 32."), (Tag) null);
+		}
 		Integer id = TAG.addTag(name, user);
 		if (id == null) {
 			return new TagsResponse(
@@ -83,6 +87,10 @@ public class TagController {
 		if (name.equals("")) {
 			return new TagsResponse(new Status(false,
 					"Name can't be empty string."), (Tag) null);
+		}
+		if (name.length() > 32) {
+			return new TagsResponse(new Status(false,
+					"Name length be longer than 32."), (Tag) null);
 		}
 		if (!TAG.updateTag(id, name)) {
 			return new TagsResponse(
