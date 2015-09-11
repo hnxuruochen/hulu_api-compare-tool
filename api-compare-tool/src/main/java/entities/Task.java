@@ -46,9 +46,11 @@ public class Task {
 		public Task mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Task task = new Task();
 			task.setId(rs.getInt("id"));
+			task.setName(rs.getString("name"));
 			task.setCreator(rs.getString("creator"));
 			task.setTagId(rs.getInt("tag_id"));
 			task.setTime(rs.getDate("time") + "  " + rs.getTime("time"));
+			task.setIsXml(rs.getBoolean("is_xml"));
 			if (fullData) {
 				task.setParam1(rs.getString("param1"));
 				task.setParam2(rs.getString("param2"));
@@ -57,7 +59,6 @@ public class Task {
 				task.setFileId(rs.getString("file_id"));
 				task.setIncludeHeaders(rs.getBoolean("include_headers"));
 				task.setHeaders(rs.getString("headers"));
-				task.setIsXml(rs.getBoolean("is_xml"));
 				task.setQps(rs.getDouble("qps"));
 			}
 			task.setType(rs.getInt("type"));
@@ -69,6 +70,7 @@ public class Task {
 	}
 
 	private Integer id = null;
+	private String name = null;
 	private String creator = null;
 	private Integer tagId = null;
 	private String time = null;
@@ -89,6 +91,10 @@ public class Task {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void setCreator(String creator) {
@@ -127,11 +133,10 @@ public class Task {
 		this.type = type;
 	}
 
-
 	public void setIncludeHeaders(Boolean includeHeaders) {
 		this.includeHeaders = includeHeaders;
 	}
-	
+
 	public void setHeaders(String headers) {
 		this.headers = headers;
 	}
@@ -162,6 +167,10 @@ public class Task {
 
 	public Integer getId() {
 		return id;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public String getCreator() {
@@ -203,7 +212,7 @@ public class Task {
 	public Boolean getIncludeHeaders() {
 		return includeHeaders;
 	}
-	
+
 	public String getHeaders() {
 		return headers;
 	}

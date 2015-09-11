@@ -1,7 +1,7 @@
 <!-- Search filter -->
 <div class="ui form" style="width: 80%; margin: auto;">
     <div class="fields">
-        <div class="field" style="width: 20%;">
+        <div class="field" style="width: 25%;">
             <div class="ui labeled input icon">
                 <div class="ui label" style="cursor: pointer;" ng-click="setCreatorAsUser()">
                     Creator:
@@ -10,7 +10,7 @@
                 <i class="remove circle link icon" ng-click="clearCreator()"></i>
             </div>
         </div>
-        <div class="field" style="width: 40%;">
+        <div class="field" style="width: 50%;">
             <div class="ui labeled input">
                 <div class="ui label">
                     Tags:
@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-        <div class="field" style="width: 20%;">
+        <div class="field" style="width: 25%;">
             <div class="ui labeled input">
                 <div class="ui label">
                     Status:
@@ -56,20 +56,24 @@
     <thead>
         <tr>
             <th style="width: 5%;">ID</th>
-            <th style="width: 20%;">Creator</th>
-            <th style="width: 25%;">Tag</th>
+            <th style="width: 25%;">Name</th>
+            <th style="width: 15%;">Creator</th>
+            <th style="width: 10%;">Tag</th>
             <th style="width: 10%;">Type</th>
-            <th style="width: 10%;">Errors</th>
-            <th style="width: 20%;">Time</th>
+            <th style="width: 5%;">Format</th>
+            <th style="width: 5%;">Errors</th>
+            <th style="width: 15%;">Time</th>
             <th style="width: 10%;">Status</th>
         </tr>
     </thead>
     <tbody>
         <tr ng-repeat="t in searchResult" ng-class="{positive: t.status == 3 && t.errorsCount == 0, negative: t.status == 3 && t.errorsCount > 0, warning: t.status == 2}" ng-show="!searchData.preparingData">
             <td>{{t.id}}</td>
+            <td>{{t.name}}</td>
             <td>{{t.creator}}</td>
             <td>{{tagsIdMap[t.tagId].name}}</td>
             <td>{{types[t.type]}}</td>
+            <td>{{formats[t.isXml ? 1 : 0]}}</td>
             <td>{{t.errorsCount}}</td>
             <td>{{t.time}}</td>
             <td>

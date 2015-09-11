@@ -24,9 +24,9 @@ import entities.Task;
  */
 public enum TaskOperator {
 	INSTANCE;
-	private static final String BASIC_TASK = "id, creator, tag_id, time, type, errors_limit, errors_count, status";
+	private static final String BASIC_TASK = "id, name, creator, tag_id, time, type, is_xml, errors_limit, errors_count, status";
 	private static final String FULL_TASK = BASIC_TASK
-			+ ", param1, param2, use_file, file_id, qps, requests, headerss, include_header, is_xml";
+			+ ", param1, param2, use_file, file_id, qps, requests, headers, include_headers";
 	private JdbcTemplate template = null;
 
 	TaskOperator() {
@@ -70,7 +70,7 @@ public enum TaskOperator {
 	}
 
 	public int newTask(Task task) {
-		String q = "INSERT INTO tasks(creator, tag_id, time, type, param1, param2, use_file, file_id, qps, requests, include_headers, headers, is_xml, errors_limit, status) VALUES (?, ?, CURRENT_TIMESTAMP(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		String q = "INSERT INTO tasks(name, creator, tag_id, time, type, param1, param2, use_file, file_id, qps, requests, include_headers, headers, is_xml, errors_limit, status) VALUES (?, ?, ?, CURRENT_TIMESTAMP(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		// Get auto generated primary key.
 		KeyHolder id = new GeneratedKeyHolder();
 		template.update(new PreparedStatementCreator() {
@@ -79,20 +79,21 @@ public enum TaskOperator {
 					throws SQLException {
 				PreparedStatement ps = con.prepareStatement(q,
 						Statement.RETURN_GENERATED_KEYS);
-				ps.setString(1, task.getCreator());
-				ps.setInt(2, task.getTagId());
-				ps.setInt(3, task.getType());
-				ps.setString(4, task.getParam1());
-				ps.setString(5, task.getParam2());
-				ps.setBoolean(6, task.getUseFile());
-				ps.setString(7, task.getFileId());
-				ps.setDouble(8, task.getQps());
-				ps.setString(9, task.getRequests());
-				ps.setBoolean(10, task.getIncludeHeaders());
-				ps.setString(11, task.getHeaders());
-				ps.setBoolean(12, task.getIsXml());
-				ps.setInt(13, task.getErrorsLimit());
-				ps.setInt(14, Task.Status.WATING);
+				ps.setString(1, task.getName());
+				ps.setString(2, task.getCreator());
+				ps.setInt(3, task.getTagId());
+				ps.setInt(4, task.getType());
+				ps.setString(5, task.getParam1());
+				ps.setString(6, task.getParam2());
+				ps.setBoolean(7, task.getUseFile());
+				ps.setString(8, task.getFileId());
+				ps.setDouble(9, task.getQps());
+				ps.setString(10, task.getRequests());
+				ps.setBoolean(11, task.getIncludeHeaders());
+				ps.setString(12, task.getHeaders());
+				ps.setBoolean(13, task.getIsXml());
+				ps.setInt(14, task.getErrorsLimit());
+				ps.setInt(15, Task.Status.WATING);
 				return ps;
 			}
 		}, id);
@@ -100,12 +101,12 @@ public enum TaskOperator {
 	}
 
 	public void updateTask(Task task) {
-		String q = "UPDATE tasks SET tag_id = ?, time = CURRENT_TIMESTAMP(), type = ?, param1 = ?, param2 = ?, use_file = ?, file_id = ?, qps = ?, requests = ?, include_headers = ?, headers = ?, is_xml = ?, errors_limit = ? WHERE id = ?;";
-		template.update(q, task.getTagId(), task.getType(), task.getParam1(),
-				task.getParam2(), task.getUseFile(), task.getFileId(),
-				task.getQps(), task.getRequests(), task.getIncludeHeaders(),
-				task.getHeaders(), task.getIsXml(), task.getErrorsLimit(),
-				task.getId());
+		String q = "UPDATE tasks SET name = ?, tag_id = ?, time = CURRENT_TIMESTAMP(), type = ?, param1 = ?, param2 = ?, use_file = ?, file_id = ?, qps = ?, requests = ?, include_headers = ?, headers = ?, is_xml = ?, errors_limit = ? WHERE id = ?;";
+		template.update(q, task.getName(), task.getTagId(), task.getType(),
+				task.getParam1(), task.getParam2(), task.getUseFile(),
+				task.getFileId(), task.getQps(), task.getRequests(),
+				task.getIncludeHeaders(), task.getHeaders(), task.getIsXml(),
+				task.getErrorsLimit(), task.getId());
 	}
 
 	public void updateTask(int id, int errorsCount, int status) {

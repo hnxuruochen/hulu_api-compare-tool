@@ -3,6 +3,7 @@ var mainApp = angular.module("mainApp", ["ngRoute"]);
 mainApp.controller("layoutController", function($scope, $rootScope, $http) {
     // Initialize.
     $rootScope.types = ["Text", "Service"];
+    $rootScope.formats = ["json", "xml"];
     $rootScope.status = ["No data", "Waiting", "Running", "Finished"];
     $rootScope.searchResult = [];
     // Load user info first.

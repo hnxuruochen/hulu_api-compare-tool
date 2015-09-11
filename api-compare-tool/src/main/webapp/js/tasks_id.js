@@ -40,6 +40,7 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
     // Create a new task object.
     $scope.newTask = function() {
         $scope.task = {};
+        $scope.task.name = "";
         $scope.task.tagId = 1;
         $scope.task.param1 = "";
         $scope.task.param2 = "";
@@ -107,6 +108,7 @@ mainApp.controller("TasksIdController", function($scope, $routeParams, $http, $l
             $scope.task.qps = 0;
         }
         var params = {
+            name: $scope.task.name,
             tagId: $scope.task.tagId,
             errorsLimit: $scope.task.errorsLimit,
             type: $scope.task.type,
