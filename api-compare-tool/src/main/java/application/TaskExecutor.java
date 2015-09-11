@@ -172,7 +172,7 @@ public class TaskExecutor implements Runnable {
 		public void completed(HttpResponse response) {
 			String header = null;
 			// Get header if it also need compare.
-			if (task.getIncludeHeader()) {
+			if (task.getIncludeHeaders()) {
 				header = Utils.getHttpResponseHeaderToJson(response, headers);
 			}
 			compareTask.setOutput(id, Utils.getHttpResponseBody(response),
