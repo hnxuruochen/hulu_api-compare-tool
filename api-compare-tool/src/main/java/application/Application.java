@@ -6,8 +6,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-import configs.Config;
-
 /**
  * App starter.
  * 
@@ -28,9 +26,8 @@ public class Application {
 		 * logger.setLevel(ch.qos.logback.classic.Level.INFO);
 		 */
 		SpringApplication.run(Application.class, args);
-		// Start task executor.
-		for (int i = 1; i <= Config.TASK_EXECUTOR_NUM; i++) {
-			new Thread(new TaskExecutor()).run();
-		}
+		// Start task manager.
+		new TaskManager().work();
+		
 	}
 }

@@ -4,10 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -30,8 +27,6 @@ import comparator.JsonComparator;
 import comparator.XmlComparator;
 import configs.Config;
 import entities.Task;
-import entities.Task.TaskMapper;
-import operators.Database;
 import operators.ErrorOperator;
 import operators.TaskOperator;
 import utils.Utils;
@@ -197,11 +192,9 @@ public class TaskExecutor implements Runnable {
 	private static final RequestConfig REQUEST_CONFIG = RequestConfig.custom()
 			.setSocketTimeout(10000).setConnectTimeout(10000).build();
 
-	private Connection con = null;
 	private ObjectMapper objectMapper = null;
-	private TaskMapper taskMapper = null;
-
 	private Task task = null;
+	private Semaphore executorLimit = null;
 	private Set<String> headers = null;
 	private CloseableHttpAsyncClient httpClient = null;
 	private CountDownLatch latch = null;
@@ -211,12 +204,10 @@ public class TaskExecutor implements Runnable {
 	/**
 	 * Initialize Connection and tools.
 	 */
-	public TaskExecutor() throws SQLException {
-		con = Database.getConneciont();
-		// Use transaction.
-		con.setAutoCommit(false);
-		taskMapper = new Task.TaskMapper(true);
+	public TaskExecutor(Task task, Semaphore executorLimit) throws SQLException {
 		objectMapper = new ObjectMapper();
+		this.task = task;
+		this.executorLimit = executorLimit;
 	}
 
 	/**
@@ -269,6 +260,7 @@ public class TaskExecutor implements Runnable {
 	 *            Whether finished sending all requests.
 	 */
 	private void releaseLock(boolean finish) {
+		// I think this logic needn't synchronization.
 		if (finish) {
 			latch = new CountDownLatch(1);
 		} else {
@@ -318,7 +310,7 @@ public class TaskExecutor implements Runnable {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private void work() throws SQLException, IOException, InterruptedException {
+	private void work() throws InterruptedException, IOException {
 		// Initialize lock, client, headers need check.
 		requestSemaphore = new Semaphore(Config.REQUESTS_LIMIT);
 		task.setErrorsCount(0);
@@ -375,35 +367,16 @@ public class TaskExecutor implements Runnable {
 				Task.Status.FINISHED);
 	}
 
-	@Override
+	/**
+	 * Execute task, catch exception and release executor limit lock.
+	 */
+	@Override	
 	public void run() {
 		try {
-			while (true) {
-				// Fetch a task and mark status. Use transaction.
-				Statement st = con.createStatement();
-				String q = "SELECT * FROM tasks WHERE status = "
-						+ Task.Status.WATING + " AND type = "
-						+ Task.Type.SERVICE + " LIMIT 1;";
-				ResultSet rs = st.executeQuery(q);
-				task = null;
-				if (rs.next()) {
-					task = taskMapper.mapRow(rs, 0);
-					st.execute("UPDATE tasks SET status = "
-							+ Task.Status.RUNNING + " WHERE id = "
-							+ task.getId());
-				}
-				rs.close();
-				st.close();
-				con.commit();
-				if (task != null) {
-					work();
-				} else {
-					Thread.sleep(Config.TASK_SLEEP_TIME);
-				}
-			}
-		} catch (SQLException | InterruptedException | IOException e) {
-			e.printStackTrace();
-			return;
+			work();
+		} catch (InterruptedException | IOException e) {
+		} finally {
+			executorLimit.release();
 		}
 	}
 }

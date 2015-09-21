@@ -131,7 +131,7 @@ public enum TaskOperator {
 			output = JsonComparator.compare(task.getParam1(), task.getParam2());
 		}
 
-		if ((output != null) && (!output.startsWith("*"))) {
+		if ((output != null) && (!"*+-".contains(output.charAt(0) + ""))) {
 			updateTask(task.getId(), 0, Task.Status.FINISHED);
 		} else {
 			String message = "Different text.";
